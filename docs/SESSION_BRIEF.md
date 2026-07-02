@@ -6,26 +6,29 @@ Data: 2026-07-02
 
 Obiettivo della sessione:
 
-- verificare accessibilita base dei controlli principali;
-- controllare cosa manca da installare;
-- guidare eventuali installazioni future senza aggiungere dipendenze premature.
+- portare Ollama dentro la UI in modo leggibile;
+- mostrare se il modello configurato e davvero installato;
+- non cambiare ancora modello dalla UI, per evitare ambiguita operativa;
+- verificare il pannello con test e health check locale.
 
 ## Decisioni Prese
 
-- Non installiamo Playwright ora: manca un bisogno immediato di test browser reale.
-- Non installiamo jsdom o Testing Library ora: i test attuali sono stabili con Vitest e funzioni pure.
-- Le installazioni future sono documentate in `docs/INSTALLATION_AUDIT.md`.
-- I controlli principali devono avere focus visibile e nomi accessibili.
+- `/api/health` ora restituisce anche `llm`, con diagnostica provider.
+- Il provider `ollama` interroga `GET /api/tags` di Ollama.
+- La Console Interrogatoria mostra stato diagnostico, base URL e modelli installati.
+- La selezione dinamica del modello resta fuori da questa sessione: prima mostriamo lo stato, poi eventualmente abilitiamo il cambio.
 
 ## File Aggiornati
 
-- `src/styles/globals.css`
+- `server/llm/types.ts`
+- `server/llm/mock-provider.ts`
+- `server/llm/ollama-provider.ts`
+- `server/llm/ollama-provider.test.ts`
+- `server/app.ts`
+- `server/app.test.ts`
+- `src/lib/api-types.ts`
+- `src/hooks/useProviderStatus.ts`
 - `src/components/InterrogationConsole.tsx`
-- `src/components/MasterTimeline.tsx`
-- `src/components/FinancialDashboard.tsx`
-- `src/components/DeclutteringGraveyard.tsx`
-- `src/components/BotanicalPlan.tsx`
-- `docs/INSTALLATION_AUDIT.md`
 - `README.md`
 - `docs/ROADMAP.md`
 - `docs/TRACKER.md`
@@ -33,49 +36,49 @@ Obiettivo della sessione:
 
 ## Stato Attuale
 
-- Focus visibile globale aggiunto per `button`, `input`, `textarea` e `summary`.
-- Textarea principali collegate a label tramite `htmlFor` e `id`.
-- Input costi con `aria-label` descrittivo.
-- Pulsanti timeline, botanica e decluttering con stati/etichette ARIA base.
-- Tooling attuale sufficiente per sviluppo, test e build.
-- `node_modules` e `pnpm-lock.yaml` presenti.
-- `pnpm` disponibile.
-- Ollama client installato.
-- Ollama server verificato con permesso locale.
-- `gemma4:latest` risulta installato.
+- La UI mostra provider e modello come prima.
+- Se il provider e `ollama`, la UI mostra anche:
+  - stato `ready`, `missing_model` o `unreachable`;
+  - endpoint Ollama;
+  - dettaglio diagnostico;
+  - lista dei modelli installati;
+  - evidenza sul modello configurato.
+- `gemma4:latest` risulta `ready` nella prova locale.
+- Health check reale verificato su `http://127.0.0.1:5175/api/health`.
+- Dev server avviato su `http://127.0.0.1:5175/`.
 
 ## Controllo Qualita Sessione
 
 Errori o lacune trovate:
 
-- Alcune label visive non erano collegate ai campi con `htmlFor`.
-- Alcuni pulsanti erano comprensibili visivamente ma meno chiari per screen reader.
-- Il sandbox Codex non puo interrogare il server Ollama locale senza permesso; con permesso, `ollama list` ha confermato `gemma4:latest`.
-- Playwright, jsdom e Testing Library non sono installati.
+- Prima la UI diceva solo quale modello era configurato, non se fosse davvero installato.
+- Mancava un modo visibile per distinguere Ollama non raggiungibile da modello mancante.
 
 Correzioni applicate:
 
-- Aggiunto focus visibile globale.
-- Aggiunti `id` e `htmlFor` alle textarea principali.
-- Aggiunti `aria-label`, `aria-pressed` e `aria-current` dove utile.
-- Aggiunta guida installazioni con comandi e priorita.
+- Aggiunta diagnostica LLM nel contratto provider.
+- Aggiunta diagnostica Ollama via `/api/tags`.
+- Aggiunto pannello diagnostico nella Console Interrogatoria.
+- Aggiunti test per health diagnostics e provider Ollama con modello presente/mancante.
 
 Verifiche eseguite:
 
-- `pnpm test`: 22 test passanti.
+- `pnpm test`: 25 test passanti.
 - `pnpm typecheck`: completato senza errori.
+- `pnpm build`: completato senza errori.
+- `curl http://127.0.0.1:5175/api/health`: `provider=ollama`, `model=gemma4:latest`, `llm.status=ready`.
 
 ## Prossima Sessione Consigliata
 
 Obiettivo:
 
-- decidere se introdurre un vero test browser con Playwright o continuare con hardening funzionale.
+- decidere se permettere la selezione modello dalla UI o passare al packaging locale.
 
 Passi consigliati:
 
-1. Se vogliamo testare la UI come utente reale, installare Playwright.
-2. Se vogliamo evitare nuove dipendenze, aggiungere controlli funzionali mirati su API e helper.
-3. Poi scegliere tra test browser, gestione modelli Ollama in UI o packaging locale.
+1. Se vogliamo selezione modello, definire dove salvare la scelta: `.env`, SQLite o solo sessione.
+2. Se vogliamo packaging, preparare comandi semplici per avvio locale senza Codex.
+3. Se vogliamo test browser, installare Playwright solo a quel punto.
 
 ## Promemoria Operativo
 

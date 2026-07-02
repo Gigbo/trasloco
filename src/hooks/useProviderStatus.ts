@@ -26,6 +26,7 @@ export function useProviderStatus() {
         service: payload.service,
         provider: payload.provider ?? "sconosciuto",
         model: payload.model ?? null,
+        llm: payload.llm ?? null,
         timestamp: payload.timestamp
       });
     } catch (error) {
@@ -33,6 +34,7 @@ export function useProviderStatus() {
         status: "offline",
         provider: "backend offline",
         model: null,
+        llm: null,
         detail:
           error instanceof Error
             ? error.message

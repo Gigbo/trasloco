@@ -73,6 +73,54 @@ export function InterrogationConsole({
             {providerStatus.model ?? "non dichiarato"}
           </dd>
         </dl>
+        {providerStatus.llm ? (
+          <div className="mt-3 border-t border-neutral-800 pt-3">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs uppercase text-neutral-600">Diagnostica Ollama</p>
+              <span
+                className={`border px-2 py-1 text-xs font-semibold uppercase ${
+                  providerStatus.llm.status === "ready" ||
+                  providerStatus.llm.status === "not_applicable"
+                    ? "border-emerald-800 text-emerald-300"
+                    : "border-red-900 text-red-300"
+                }`}
+              >
+                {providerStatus.llm.status}
+              </span>
+            </div>
+            {providerStatus.llm.baseUrl ? (
+              <p className="mt-2 font-mono text-xs text-neutral-500">
+                {providerStatus.llm.baseUrl}
+              </p>
+            ) : null}
+            {providerStatus.llm.detail ? (
+              <p className="mt-2 text-xs leading-5 text-neutral-400">
+                {providerStatus.llm.detail}
+              </p>
+            ) : null}
+            {providerStatus.llm.installedModels.length > 0 ? (
+              <div className="mt-3">
+                <p className="text-xs uppercase text-neutral-600">
+                  Modelli installati: {providerStatus.llm.installedModels.length}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {providerStatus.llm.installedModels.slice(0, 4).map((model) => (
+                    <span
+                      className={`border px-2 py-1 font-mono text-xs ${
+                        model === providerStatus.model
+                          ? "border-emerald-800 text-emerald-300"
+                          : "border-neutral-800 text-neutral-400"
+                      }`}
+                      key={model}
+                    >
+                      {model}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
         {providerStatus.detail ? (
           <p className="mt-3 text-xs leading-5 text-red-300">{providerStatus.detail}</p>
         ) : null}

@@ -50,11 +50,16 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
   });
 
   app.get("/api/health", async () => {
+    const llmDiagnostics = llmProvider.diagnostics
+      ? await llmProvider.diagnostics()
+      : null;
+
     return {
       status: "ok",
       service: "relocation-manager-api",
       provider: llmProvider.name,
       model: llmProvider.model ?? null,
+      llm: llmDiagnostics,
       timestamp: new Date().toISOString()
     };
   });

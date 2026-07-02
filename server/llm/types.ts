@@ -9,8 +9,17 @@ export type ChatResponse = {
   assistantText: string;
 };
 
+export type LlmDiagnostics = {
+  status: "ready" | "missing_model" | "unreachable" | "not_applicable";
+  baseUrl?: string;
+  installedModels: string[];
+  selectedModelInstalled?: boolean;
+  detail?: string;
+};
+
 export type LlmProvider = {
   name: LlmProviderName;
   model?: string;
+  diagnostics?(): Promise<LlmDiagnostics>;
   chat(request: ChatRequest): Promise<ChatResponse>;
 };

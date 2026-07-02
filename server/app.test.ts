@@ -57,6 +57,47 @@ describe("backend API", () => {
     await app.close();
   });
 
+  it("includes provider diagnostics in /api/health when available", async () => {
+    const diagnosticProvider: LlmProvider = {
+      name: "ollama",
+      model: "gemma4:latest",
+      async diagnostics() {
+        return {
+          status: "ready",
+          baseUrl: "http://127.0.0.1:11434",
+          installedModels: ["gemma4:latest"],
+          selectedModelInstalled: true,
+          detail: "Modello disponibile."
+        };
+      },
+      async chat() {
+        return {
+          provider: "ollama",
+          assistantText: "ok"
+        };
+      }
+    };
+    const app = buildTestApp(diagnosticProvider);
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/api/health"
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      provider: "ollama",
+      model: "gemma4:latest",
+      llm: {
+        status: "ready",
+        installedModels: ["gemma4:latest"],
+        selectedModelInstalled: true
+      }
+    });
+
+    await app.close();
+  });
+
   it("returns a clear 502 when the LLM provider fails", async () => {
     const failingProvider: LlmProvider = {
       name: "ollama",

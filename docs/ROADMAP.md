@@ -326,6 +326,8 @@ Criteri di completamento:
 13. Test e2e chat -> dashboard. DONE
 14. Verifica accessibilita base. DONE
 15. Controllo installazioni e tooling locale. DONE
-16. Eventuale test browser con Playwright.
-17. Eventuale API cloud.
-18. Test e packaging.
+16. Diagnostica Ollama in UI. DONE
+17. Eventuale selezione modello Ollama da UI.
+18. Eventuale test browser con Playwright.
+19. Eventuale API cloud.
+20. Test e packaging.

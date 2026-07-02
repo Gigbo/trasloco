@@ -203,7 +203,7 @@ Spiegazione semplice:
 
 ## API Locali
 
-- `GET /api/health`: verifica che il backend sia attivo e restituisce provider e modello in uso.
+- `GET /api/health`: verifica backend, provider, modello e diagnostica Ollama.
 - `POST /api/chat`: riceve `{ "message": "..." }` e restituisce una risposta LLM con eventuale snapshot salvato.
 - `GET /api/state`: restituisce ultimo snapshot valido, snapshot recenti, conversazioni recenti e stato utente salvato in SQLite.
 - `GET /api/snapshots`: restituisce lo storico dei piani validati.
@@ -246,7 +246,7 @@ ollama pull gemma4:latest
 ollama serve
 ```
 
-La Console Interrogatoria mostra quale provider e modello sono attivi leggendo `/api/health`. Nel Mac di sviluppo attuale `gemma4:latest` e stato verificato con `snapshotSaved=true`. `llama3.2:latest` resta una buona alternativa piu leggera e veloce. Se Ollama non risponde, il backend restituisce un errore esplicito `502` con dettaglio leggibile. Per tornare allo sviluppo stabile basta rimettere `LLM_PROVIDER=mock`.
+La Console Interrogatoria mostra quale provider e modello sono attivi leggendo `/api/health`. Se il provider e `ollama`, mostra anche stato diagnostico, endpoint locale, numero di modelli installati e conferma se il modello configurato e disponibile. Nel Mac di sviluppo attuale `gemma4:latest` e stato verificato con `snapshotSaved=true` e diagnostica `ready`. `llama3.2:latest` resta una buona alternativa piu leggera e veloce. Se Ollama non risponde, il backend restituisce un errore esplicito `502` con dettaglio leggibile. Per tornare allo sviluppo stabile basta rimettere `LLM_PROVIDER=mock`.
 
 ## Persistenza Locale
 

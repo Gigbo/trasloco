@@ -5,6 +5,13 @@ type OllamaGenerateResponse = {
   error?: string;
 };
 
+type OllamaTagsResponse = {
+  models?: Array<{
+    name?: string;
+    model?: string;
+  }>;
+};
+
 const defaultBaseUrl = "http://127.0.0.1:11434";
 const defaultModel = "llama3.1:8b";
 
@@ -15,6 +22,51 @@ export function createOllamaProvider(): LlmProvider {
   return {
     name: "ollama",
     model,
+    async diagnostics() {
+      const response = await fetch(`${baseUrl}/api/tags`, {
+        method: "GET"
+      }).catch((error: unknown) => {
+        return {
+          ok: false,
+          status: 0,
+          json: async () => ({
+            error: `Ollama non raggiungibile su ${baseUrl}. Dettaglio: ${formatError(error)}`
+          })
+        } as Response;
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | (OllamaTagsResponse & { error?: string })
+        | null;
+
+      if (!response.ok) {
+        return {
+          status: "unreachable",
+          baseUrl,
+          installedModels: [],
+          selectedModelInstalled: false,
+          detail:
+            payload?.error ??
+            `Ollama ha risposto con HTTP ${response.status} durante la diagnostica.`
+        };
+      }
+
+      const installedModels = (payload?.models ?? [])
+        .map((item) => item.name ?? item.model)
+        .filter((item): item is string => Boolean(item))
+        .sort((left, right) => left.localeCompare(right));
+      const selectedModelInstalled = installedModels.includes(model);
+
+      return {
+        status: selectedModelInstalled ? "ready" : "missing_model",
+        baseUrl,
+        installedModels,
+        selectedModelInstalled,
+        detail: selectedModelInstalled
+          ? `Modello "${model}" disponibile in Ollama.`
+          : `Modello configurato "${model}" non trovato in Ollama.`
+      };
+    },
     async chat(request: ChatRequest): Promise<ChatResponse> {
       const response = await fetch(`${baseUrl}/api/generate`, {
         method: "POST",

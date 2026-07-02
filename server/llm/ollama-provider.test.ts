@@ -71,4 +71,74 @@ describe("ollama provider", () => {
       })
     ).rejects.toThrow("Ollama non raggiungibile");
   });
+
+  it("reports Ollama diagnostics with installed models", async () => {
+    process.env.OLLAMA_BASE_URL = "http://127.0.0.1:11434/";
+    process.env.OLLAMA_MODEL = "gemma4:latest";
+
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          models: [
+            {
+              name: "llama3.2:latest"
+            },
+            {
+              name: "gemma4:latest"
+            }
+          ]
+        }),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      )
+    );
+
+    const provider = createOllamaProvider();
+    const diagnostics = await provider.diagnostics?.();
+
+    expect(fetchMock).toHaveBeenCalledWith("http://127.0.0.1:11434/api/tags", {
+      method: "GET"
+    });
+    expect(diagnostics).toMatchObject({
+      status: "ready",
+      baseUrl: "http://127.0.0.1:11434",
+      installedModels: ["gemma4:latest", "llama3.2:latest"],
+      selectedModelInstalled: true
+    });
+  });
+
+  it("reports when the configured Ollama model is missing", async () => {
+    process.env.OLLAMA_MODEL = "gemma4:latest";
+
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          models: [
+            {
+              name: "llama3.2:latest"
+            }
+          ]
+        }),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      )
+    );
+
+    const provider = createOllamaProvider();
+    const diagnostics = await provider.diagnostics?.();
+
+    expect(diagnostics).toMatchObject({
+      status: "missing_model",
+      installedModels: ["llama3.2:latest"],
+      selectedModelInstalled: false
+    });
+  });
 });

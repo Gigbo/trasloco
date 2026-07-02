@@ -8,6 +8,13 @@ export function createMockProvider(): LlmProvider {
   return {
     name: "mock",
     model: "fixture",
+    async diagnostics() {
+      return {
+        status: "not_applicable",
+        installedModels: [],
+        detail: "Provider mock: nessun modello locale richiesto."
+      };
+    },
     async chat(request: ChatRequest): Promise<ChatResponse> {
       const fixture = await readFile(fixturePath, "utf8");
       const assistantText = [

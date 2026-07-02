@@ -46,6 +46,13 @@ export type ProviderStatusPayload = {
   service?: string;
   provider: string;
   model: string | null;
+  llm?: {
+    status: "ready" | "missing_model" | "unreachable" | "not_applicable";
+    baseUrl?: string;
+    installedModels: string[];
+    selectedModelInstalled?: boolean;
+    detail?: string;
+  } | null;
   timestamp?: string;
   detail?: string;
 };
