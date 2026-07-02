@@ -14,6 +14,7 @@ Data controllo: 2026-07-02
 | Ollama client | OK | Versione client rilevata: `0.30.10` |
 | Ollama server | OK | Verifica locale eseguita con permesso |
 | Modello `gemma4:latest` | OK | Installato, dimensione rilevata: 9.6 GB |
+| Modello `llama3.2:latest` | OK | Installato, alternativa piu leggera per prove rapide |
 | Playwright | Non installato | Non serve ora; utile per veri test browser end-to-end |
 | jsdom / Testing Library | Non installati | Non servono ora; utili per test componenti React |
 
@@ -47,7 +48,7 @@ Se `pnpm -v` non risponde:
 npm install -g pnpm
 ```
 
-Verifica eseguita: `ollama list` mostra `gemma4:latest`.
+Verifica eseguita: `ollama list` mostra `gemma4:latest` e `llama3.2:latest`.
 
 Se in futuro `ollama list` dice che Ollama non e attivo, apri l'app Ollama oppure usa:
 

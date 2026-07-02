@@ -90,6 +90,7 @@ Legenda stato:
 | S5-007 | Controllare installazioni mancanti | DONE | Media | Full-Stack Developer | Audit scritto in `docs/INSTALLATION_AUDIT.md` |
 | S5-008 | Mostrare diagnostica Ollama in UI | DONE | Media | LLM Integration Engineer | Console mostra stato modello, endpoint e modelli installati |
 | S5-009 | Permettere cambio modello Ollama da UI | DONE | Media | LLM Integration Engineer | Select usa solo modelli installati e salva scelta in SQLite |
+| S5-010 | Preparare avvio locale guidato | DONE | Media | Technical Guide / Code Translator | `docs/RUN_LOCAL.md` e `pnpm check:local` presenti |
 
 ## Rischi Aperti
 
@@ -130,3 +131,4 @@ Legenda stato:
 | 2026-07-02 | Aggiungere focus visibile globale e label ai controlli | Tastiera e screen reader devono poter usare i controlli principali senza ambiguita | UI/UX Architect |
 | 2026-07-02 | Aggiungere diagnostica Ollama a `/api/health` | La UI deve distinguere backend attivo, Ollama raggiungibile e modello configurato davvero installato | LLM Integration Engineer |
 | 2026-07-02 | Salvare il modello Ollama selezionato in SQLite | La scelta utente deve sopravvivere al riavvio senza modificare automaticamente `.env` | LLM Integration Engineer |
+| 2026-07-02 | Aggiungere `pnpm check:local` | Serve una checklist leggibile per capire se il Mac e pronto prima di avviare l'app | Full-Stack Developer |

@@ -164,6 +164,7 @@ L'app non deve dipendere da un solo modello. Il backend deve usare un adattatore
 - [Guida Per Non Tecnici](docs/GUIDA_NON_TECNICA.md)
 - [Schema LLM V1](docs/SCHEMA_LLM_V1.md)
 - [Controllo Installazioni](docs/INSTALLATION_AUDIT.md)
+- [Avvio Locale](docs/RUN_LOCAL.md)
 - [Brief Di Sessione](docs/SESSION_BRIEF.md)
 
 ## Avvio Locale
@@ -190,6 +191,7 @@ Indirizzi locali:
 Controlli tecnici:
 
 ```bash
+pnpm check:local
 pnpm test
 pnpm build
 ```
@@ -197,6 +199,7 @@ pnpm build
 Spiegazione semplice:
 
 - `pnpm install` prepara gli strumenti del progetto;
+- `pnpm check:local` controlla strumenti, dipendenze e Ollama;
 - `pnpm dev` accende frontend e backend in locale;
 - `pnpm test` controlla che parser e schema respingano output LLM sbagliati;
 - `pnpm build` verifica che l'app possa essere impacchettata.
