@@ -1,0 +1,8 @@
+Risposta con campi obbligatori mancanti.
+
+```json
+{
+  "schema_version": "1.0.0",
+  "fase_trasloco": "Pianificazione iniziale"
+}
+```

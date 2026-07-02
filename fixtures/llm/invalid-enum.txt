@@ -1,0 +1,48 @@
+Risposta con enum non ammessa.
+
+```json
+{
+  "schema_version": "1.0.0",
+  "snapshot_id": "snap_fixture_invalid_enum_001",
+  "created_at": "2026-07-01T10:30:00+02:00",
+  "fase_trasloco": "Pianificazione iniziale",
+  "sintesi_operativa": "Piano minimo.",
+  "task_logistici": [
+    {
+      "id": "task_bad_priority_001",
+      "titolo": "Task con priorita errata",
+      "descrizione": "Questo task deve fallire.",
+      "scadenza_giorni_al_trasloco": -7,
+      "priorita": "Urgentissima",
+      "categoria": "altro",
+      "critico": false,
+      "criterio_completamento": "Non applicabile.",
+      "stato_suggerito": "Da fare",
+      "dipendenze": []
+    }
+  ],
+  "analisi_costi": [],
+  "verdetto_decluttering": [],
+  "logistica_botanica": {
+    "interventi_pre_trasloco": [],
+    "layout_nuovo_spazio": {
+      "giardino_4x2": {
+        "larghezza_m": 4,
+        "profondita_m": 2,
+        "esposizione_solare": "Sconosciuta",
+        "celle": []
+      },
+      "terrazzo": {
+        "esposizione_solare": "Sconosciuta",
+        "vincoli": [],
+        "uso_suggerito": "Da definire."
+      },
+      "flussi_movimento": []
+    },
+    "piante_critiche": [],
+    "note_generali": "Nessuna nota."
+  },
+  "domande_aperte": [],
+  "rischi": []
+}
+```
