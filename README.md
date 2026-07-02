@@ -215,6 +215,36 @@ Spiegazione semplice:
 
 Il provider attuale e `mock`: non chiama Ollama e non usa API cloud. Serve a sviluppare e testare la dashboard senza dipendere da un modello reale.
 
+## Provider LLM
+
+Provider disponibili:
+
+- `mock`: usa una fixture locale stabile, consigliato per sviluppo e test.
+- `ollama`: chiama un modello locale tramite Ollama.
+
+Configurazione mock:
+
+```bash
+LLM_PROVIDER=mock
+```
+
+Configurazione Ollama:
+
+```bash
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://127.0.0.1:11434
+OLLAMA_MODEL=llama3.1:8b
+```
+
+Prima di usare `ollama`, il servizio Ollama deve essere attivo e il modello deve essere disponibile localmente. Esempio:
+
+```bash
+ollama pull llama3.1:8b
+ollama serve
+```
+
+Se Ollama non risponde, il backend restituisce un errore esplicito. Per tornare allo sviluppo stabile basta rimettere `LLM_PROVIDER=mock`.
+
 ## Persistenza Locale
 
 Il database SQLite viene creato in `data/relocation.sqlite`.

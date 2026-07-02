@@ -6,76 +6,67 @@ Data: 2026-07-02
 
 Obiettivo della sessione:
 
-- aggiungere navigazione degli snapshot validati;
-- separare meglio piani operativi validi e conversazioni grezze;
-- esporre un endpoint dedicato per lo storico snapshot;
-- mantenere la Console Interrogatoria come centro di recupero operativo.
+- implementare l'adattatore Ollama locale;
+- mantenere il provider `mock` come modalita stabile per sviluppo e test;
+- rendere comprensibile la configurazione anche a chi non programma;
+- aggiungere test sul comportamento del provider Ollama.
 
 ## Decisioni Prese
 
-- Gli snapshot sono piani validati e restano distinti dalle conversazioni.
-- `/api/state` restituisce anche `recentSnapshots` per caricare la dashboard al refresh.
-- `/api/snapshots` espone lo storico dei piani validati in modo dedicato.
-- La Console Interrogatoria mostra due liste separate: `Piani validati` e `Storico operativo`.
-- Selezionare uno snapshot ricarica il JSON validato nella dashboard.
-- Se lo snapshot e collegato a una conversazione recente, viene ricaricato anche il messaggio utente collegato.
+- `LLM_PROVIDER=mock` resta la modalita predefinita.
+- `LLM_PROVIDER=ollama` usa `POST /api/generate` su `OLLAMA_BASE_URL`.
+- La chiamata Ollama usa `stream: false` per ricevere una singola risposta.
+- La chiamata Ollama usa `format: "json"` e un prompt vincolato allo schema `RelocationSchema`.
+- Se Ollama non e raggiungibile, il backend restituisce un errore chiaro invece di fallire in modo opaco.
 
 ## File Aggiornati
 
-- `server/db.ts`
-- `server/app.ts`
-- `server/app.test.ts`
-- `src/App.tsx`
-- `src/components/InterrogationConsole.tsx`
-- `src/lib/api-types.ts`
+- `server/llm/ollama-provider.ts`
+- `server/llm/ollama-provider.test.ts`
+- `server/llm/provider.ts`
 - `README.md`
+- `docs/GUIDA_NON_TECNICA.md`
 - `docs/TRACKER.md`
-- `docs/ROADMAP.md`
 - `docs/SESSION_BRIEF.md`
 
 ## Stato Attuale
 
-- Conversazioni recenti visibili e selezionabili.
-- Snapshot validati visibili e selezionabili.
-- Ultimo snapshot continua a caricarsi automaticamente al refresh.
-- Stati utente granulari restano separati dal payload IA.
-- Backend espone `/api/snapshots`.
-- La dashboard puo ricaricare piani precedenti senza leggere manualmente SQLite.
+- Provider `mock` funzionante.
+- Provider `ollama` implementato.
+- `.env.example` contiene gia `OLLAMA_BASE_URL` e `OLLAMA_MODEL`.
+- Per usare Ollama serve avere Ollama avviato sul Mac e il modello scaricato.
+- Il parser continua a validare la risposta: anche se Ollama produce JSON imperfetto, la dashboard non deve fidarsi ciecamente.
 
 ## Controllo Qualita Sessione
 
 Errori trovati:
 
-- Nessun errore TypeScript dopo l'aggiunta dello storico snapshot.
-- La documentazione indicava ancora lo storico snapshot come mancante; e stata aggiornata.
+- Nessun errore TypeScript dopo l'aggiunta del provider.
+- Nessun test fallito.
 
 Miglioramenti proposti:
 
-- Estrarre la persistenza dei moduli UI in un hook dedicato, per alleggerire `App.tsx`.
-- Preparare `LLM_PROVIDER=ollama` con fallback esplicito quando Ollama non risponde.
-- Aggiungere test e2e quando sara disponibile un browser Playwright installato.
+- Aggiungere un controllo visibile in UI per indicare quale provider e attivo.
+- Aggiungere un pulsante o pannello diagnostico per verificare se Ollama risponde.
+- Estrarre la persistenza dei moduli UI in un hook dedicato per alleggerire `App.tsx`.
 
 Verifiche eseguite:
 
-- `pnpm test`: 16 test passanti.
+- `pnpm test`: 18 test passanti.
 - `pnpm typecheck`: completato senza errori.
-- `pnpm build`: build Vite completata.
-- Frontend verificato su `http://127.0.0.1:5175/`.
-- `/api/snapshots` verificato via HTTP.
-- `/api/state` verificato con `recentSnapshots`.
 
 ## Prossima Sessione Consigliata
 
 Obiettivo:
 
-- implementare l'adattatore Ollama locale.
+- rendere visibile lo stato provider nella UI e migliorare diagnostica.
 
 Passi consigliati:
 
-1. Aggiungere provider `ollama` in `server/llm/provider.ts`.
-2. Usare `OLLAMA_BASE_URL` e `OLLAMA_MODEL` da `.env`.
-3. Gestire errore se Ollama non e avviato.
-4. Mantenere `mock` come fallback per sviluppo e test.
+1. Mostrare provider attivo nella Console Interrogatoria usando `/api/health`.
+2. Mostrare un avviso se provider e `ollama` ma la chiamata fallisce.
+3. Eventualmente aggiungere endpoint diagnostico leggero per Ollama.
+4. Poi refactor di `App.tsx` in hook dedicati.
 
 ## Promemoria Operativo
 

@@ -311,15 +311,16 @@ Criteri di completamento:
 
 ## Ordine Di Rilascio Consigliato
 
-1. Parser e schema.
-2. Shell dashboard.
-3. Console interrogatoria mockata.
-4. Timeline.
-5. Budget.
-6. Decluttering.
-7. Botanica.
-8. Adattatore LLM con provider mock.
-9. Integrazione Ollama locale.
-10. Eventuale API cloud.
-11. Persistenza completa.
-12. Test e packaging.
+1. Parser e schema. DONE
+2. Shell dashboard. DONE
+3. Console interrogatoria mockata. DONE
+4. Timeline. DONE
+5. Budget. DONE
+6. Decluttering. DONE
+7. Botanica. DONE
+8. Persistenza completa locale. DONE
+9. Storico conversazioni e snapshot. DONE
+10. Adattatore LLM con provider mock e Ollama. DONE
+11. Diagnostica provider e fallback UI.
+12. Eventuale API cloud.
+13. Test e packaging.

@@ -69,6 +69,19 @@ SQLite e il database locale.
 
 Metafora: e un archivio in un singolo cassetto. Non serve un ufficio esterno: sta dentro il progetto.
 
+### Ollama
+
+Ollama permette di usare un modello IA installato sul computer.
+
+Metafora: invece di telefonare a un consulente esterno, tieni un consulente nella stanza accanto. Funziona anche senza mandare i dati a un servizio cloud, ma devi prima accendere quel consulente e assicurarti che abbia il modello giusto.
+
+Nel progetto abbiamo due modalita:
+
+- `mock`: finge una risposta IA usando un esempio fisso. E la modalita piu stabile per sviluppare.
+- `ollama`: chiama davvero il modello locale installato con Ollama.
+
+Se Ollama non e acceso, l'app non deve crollare: deve mostrare un errore chiaro e permetterci di tornare a `mock`.
+
 ## Come Funziona Il Flusso
 
 1. L'utente scrive nella Console Interrogatoria.
@@ -150,4 +163,3 @@ API: porta di comunicazione tra due parti del sistema.
 Snapshot: fotografia salvata di un piano generato dall'IA.
 
 Migrazione: modifica controllata della struttura del database o dei dati.
-

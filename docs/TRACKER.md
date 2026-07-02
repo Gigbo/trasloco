@@ -20,7 +20,7 @@ Legenda stato:
 | Frontend shell | DONE | UI/UX Architect | Dashboard operativa con moduli principali creata |
 | Backend locale | DONE | Full-Stack Developer | Fastify con `/api/health` e `/api/chat` mock |
 | Persistenza SQLite | DONE | Full-Stack Developer | Conversazioni, snapshot e decisioni utente granulari salvati |
-| Test parser | DONE | QA / Reliability Engineer | 16 test totali passano, inclusi parser, backend e persistenza |
+| Test parser | DONE | QA / Reliability Engineer | 18 test totali passano, inclusi parser, backend e provider Ollama |
 
 ## Sprint 0 - Setup E Direzione
 
@@ -73,7 +73,7 @@ Legenda stato:
 | --- | --- | --- | --- | --- | --- |
 | S4-001 | Salvare conversazioni | DONE | Alta | Full-Stack Developer | Storico persistente in SQLite |
 | S4-002 | Salvare snapshot JSON validi | DONE | Alta | Full-Stack Developer | Snapshot recuperabili da `/api/state` e `/api/snapshots` |
-| S4-003 | Integrare API LLM server-side | DOING | Alta | LLM Integration Engineer | Provider mock server-side attivo; Ollama/API cloud da aggiungere |
+| S4-003 | Integrare API LLM server-side | DONE | Alta | LLM Integration Engineer | Provider mock e Ollama server-side attivi; API cloud opzionale futura |
 | S4-004 | Ripristinare ultimo stato al refresh | DONE | Alta | Full-Stack Developer | Ultimo snapshot e stati utente granulari caricati da SQLite |
 | S4-005 | Gestire fallback su errore LLM | TODO | Media | QA / Reliability Engineer | UI degradata ma usabile |
 
@@ -115,3 +115,4 @@ Legenda stato:
 | 2026-07-01 | Separare snapshot IA e decisioni utente in SQLite | Una nuova risposta LLM non deve cancellare completamenti, costi corretti o decisioni gia prese | Full-Stack Developer |
 | 2026-07-02 | Rendere lo storico conversazioni visibile nella Console Interrogatoria | L'utente deve poter recuperare risposte precedenti senza aprire SQLite o leggere JSON grezzo nel database | Full-Stack Developer |
 | 2026-07-02 | Rendere selezionabile lo storico snapshot validato | I piani operativi validi devono essere recuperabili separatamente dal testo grezzo delle conversazioni | Full-Stack Developer |
+| 2026-07-02 | Implementare provider Ollama locale | Permette usare un modello installato sul Mac mantenendo il provider mock come modalita stabile | LLM Integration Engineer |
