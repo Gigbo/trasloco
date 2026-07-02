@@ -324,6 +324,8 @@ Criteri di completamento:
 11. Diagnostica provider e fallback UI. DONE
 12. Refactor `App.tsx` in hook dedicati. DONE
 13. Test e2e chat -> dashboard. DONE
-14. Verifica accessibilita base.
-15. Eventuale API cloud.
-16. Test e packaging.
+14. Verifica accessibilita base. DONE
+15. Controllo installazioni e tooling locale. DONE
+16. Eventuale test browser con Playwright.
+17. Eventuale API cloud.
+18. Test e packaging.

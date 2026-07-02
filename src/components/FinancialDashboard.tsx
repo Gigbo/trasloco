@@ -72,6 +72,7 @@ export function FinancialDashboard({
                 <td className="p-3">
                   <input
                     className="w-28 border border-neutral-800 bg-neutral-950 px-2 py-2 font-mono text-neutral-100 outline-none focus:border-red-500"
+                    aria-label={`Stima in euro per ${cost.voce_spesa}`}
                     min={0}
                     type="number"
                     value={overrides[cost.id] ?? cost.stima_eur}

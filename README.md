@@ -163,6 +163,7 @@ L'app non deve dipendere da un solo modello. Il backend deve usare un adattatore
 - [Tracker Avanzamento](docs/TRACKER.md)
 - [Guida Per Non Tecnici](docs/GUIDA_NON_TECNICA.md)
 - [Schema LLM V1](docs/SCHEMA_LLM_V1.md)
+- [Controllo Installazioni](docs/INSTALLATION_AUDIT.md)
 - [Brief Di Sessione](docs/SESSION_BRIEF.md)
 
 ## Avvio Locale

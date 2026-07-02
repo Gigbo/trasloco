@@ -6,75 +6,76 @@ Data: 2026-07-02
 
 Obiettivo della sessione:
 
-- aggiungere il primo test end-to-end del flusso principale;
-- usare provider `mock` per avere output stabile;
-- verificare che chat, snapshot e dati dashboard restino coerenti;
-- correggere eventuali incoerenze trovate durante il controllo.
+- verificare accessibilita base dei controlli principali;
+- controllare cosa manca da installare;
+- guidare eventuali installazioni future senza aggiungere dipendenze premature.
 
 ## Decisioni Prese
 
-- Il primo e2e non usa Playwright: il progetto non ha ancora dipendenze browser e non serve introdurle per questo livello.
-- Il test copre il percorso dati `POST /api/chat` -> snapshot SQLite -> proiezioni dashboard.
-- Le trasformazioni principali della dashboard vivono in `src/lib/dashboard-projections.ts`.
-- I componenti usano le stesse funzioni pure testate dal flusso e2e.
+- Non installiamo Playwright ora: manca un bisogno immediato di test browser reale.
+- Non installiamo jsdom o Testing Library ora: i test attuali sono stabili con Vitest e funzioni pure.
+- Le installazioni future sono documentate in `docs/INSTALLATION_AUDIT.md`.
+- I controlli principali devono avere focus visibile e nomi accessibili.
 
 ## File Aggiornati
 
-- `server/e2e.test.ts`
-- `src/lib/dashboard-projections.ts`
+- `src/styles/globals.css`
+- `src/components/InterrogationConsole.tsx`
 - `src/components/MasterTimeline.tsx`
 - `src/components/FinancialDashboard.tsx`
 - `src/components/DeclutteringGraveyard.tsx`
+- `src/components/BotanicalPlan.tsx`
+- `docs/INSTALLATION_AUDIT.md`
+- `README.md`
 - `docs/ROADMAP.md`
 - `docs/TRACKER.md`
 - `docs/SESSION_BRIEF.md`
 
 ## Stato Attuale
 
-- Test totali: 22.
-- Primo e2e dati dashboard presente e passante.
-- La Master Timeline ordina i task per `scadenza_giorni_al_trasloco`.
-- Il Cruscotto Finanziario calcola il totale tramite helper condiviso.
-- Il Cimitero del Superfluo calcola la coda pendente tramite helper condiviso.
-- Provider `mock` resta la base stabile per test.
-- Provider `ollama` con `gemma4:latest` resta la configurazione locale consigliata per prove reali.
+- Focus visibile globale aggiunto per `button`, `input`, `textarea` e `summary`.
+- Textarea principali collegate a label tramite `htmlFor` e `id`.
+- Input costi con `aria-label` descrittivo.
+- Pulsanti timeline, botanica e decluttering con stati/etichette ARIA base.
+- Tooling attuale sufficiente per sviluppo, test e build.
+- `node_modules` e `pnpm-lock.yaml` presenti.
+- `pnpm` disponibile.
+- Ollama client installato.
+- Ollama server verificato con permesso locale.
+- `gemma4:latest` risulta installato.
 
 ## Controllo Qualita Sessione
 
-Errori trovati:
+Errori o lacune trovate:
 
-- La Master Timeline non ordinava davvero i task: mostrava l'ordine grezzo ricevuto dal JSON.
+- Alcune label visive non erano collegate ai campi con `htmlFor`.
+- Alcuni pulsanti erano comprensibili visivamente ma meno chiari per screen reader.
+- Il sandbox Codex non puo interrogare il server Ollama locale senza permesso; con permesso, `ollama list` ha confermato `gemma4:latest`.
+- Playwright, jsdom e Testing Library non sono installati.
 
 Correzioni applicate:
 
-- Aggiunto `getSortedTimelineTasks`.
-- `MasterTimeline` ora usa l'ordinamento condiviso.
-- Aggiunto e2e che verifica ordine timeline, totale budget e coda decluttering.
-
-Miglioramenti applicati:
-
-- Aggiunto `calculateBudgetTotal`.
-- Aggiunto `getPendingDeclutteringItems`.
-- Evitata l'aggiunta di dipendenze browser premature.
+- Aggiunto focus visibile globale.
+- Aggiunti `id` e `htmlFor` alle textarea principali.
+- Aggiunti `aria-label`, `aria-pressed` e `aria-current` dove utile.
+- Aggiunta guida installazioni con comandi e priorita.
 
 Verifiche eseguite:
 
 - `pnpm test`: 22 test passanti.
 - `pnpm typecheck`: completato senza errori.
-- `pnpm build`: completato senza errori.
 
 ## Prossima Sessione Consigliata
 
 Obiettivo:
 
-- fare una verifica accessibilita base sui controlli principali.
+- decidere se introdurre un vero test browser con Playwright o continuare con hardening funzionale.
 
 Passi consigliati:
 
-1. Controllare che bottoni, textarea, input numerici e sezioni espandibili siano raggiungibili da tastiera.
-2. Aggiungere label o `aria-label` dove il significato non e abbastanza chiaro.
-3. Verificare stati focus visibili nella Console, Timeline, Budget e Decluttering.
-4. Aggiungere test mirati solo dove il rischio e concreto.
+1. Se vogliamo testare la UI come utente reale, installare Playwright.
+2. Se vogliamo evitare nuove dipendenze, aggiungere controlli funzionali mirati su API e helper.
+3. Poi scegliere tra test browser, gestione modelli Ollama in UI o packaging locale.
 
 ## Promemoria Operativo
 
@@ -83,4 +84,4 @@ All'inizio della prossima sessione leggere:
 1. `README.md`
 2. `docs/TRACKER.md`
 3. `docs/SESSION_BRIEF.md`
-4. `docs/GUIDA_NON_TECNICA.md`
+4. `docs/INSTALLATION_AUDIT.md`

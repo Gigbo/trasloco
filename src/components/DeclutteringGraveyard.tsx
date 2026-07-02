@@ -73,6 +73,7 @@ export function DeclutteringGraveyard({
                 {(["Vendere", "Donare", "Buttare"] as const).map((action) => (
                   <button
                     className={`border px-4 py-3 text-sm font-semibold uppercase tracking-widest ${actionStyles[action]}`}
+                    aria-label={`${action} ${currentItem.oggetto}`}
                     key={action}
                     type="button"
                     onClick={() => onDecision(currentItem, action)}

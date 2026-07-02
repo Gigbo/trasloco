@@ -78,10 +78,14 @@ export function InterrogationConsole({
         ) : null}
       </section>
 
-      <label className="mt-6 block text-xs font-semibold uppercase text-neutral-500">
+      <label
+        className="mt-6 block text-xs font-semibold uppercase text-neutral-500"
+        htmlFor="interrogation-message"
+      >
         Console interrogatoria
       </label>
       <textarea
+        id="interrogation-message"
         className="mt-2 h-28 w-full resize-none border border-neutral-800 bg-neutral-950 p-3 text-sm leading-5 text-neutral-200 outline-none focus:border-red-500"
         value={message}
         onChange={(event) => onMessageChange(event.target.value)}
@@ -117,6 +121,8 @@ export function InterrogationConsole({
                   className={`w-full border-b border-neutral-900 p-3 text-left hover:bg-neutral-900 ${
                     isSelected ? "bg-neutral-900 text-neutral-100" : "bg-black"
                   }`}
+                  aria-current={isSelected ? "true" : undefined}
+                  aria-label={`Carica piano validato ${snapshot.id}: ${snapshot.payload.fase_trasloco}`}
                   key={snapshot.id}
                   type="button"
                   onClick={() => onSelectSnapshot(snapshot)}
@@ -162,6 +168,8 @@ export function InterrogationConsole({
                   className={`w-full border-b border-neutral-900 p-3 text-left hover:bg-neutral-900 ${
                     isSelected ? "bg-neutral-900 text-neutral-100" : "bg-black"
                   }`}
+                  aria-current={isSelected ? "true" : undefined}
+                  aria-label={`Carica conversazione ${conversation.id}`}
                   key={conversation.id}
                   type="button"
                   onClick={() => onSelectConversation(conversation)}
@@ -184,10 +192,14 @@ export function InterrogationConsole({
         </div>
       </section>
 
-      <label className="mt-6 block text-xs font-semibold uppercase text-neutral-500">
+      <label
+        className="mt-6 block text-xs font-semibold uppercase text-neutral-500"
+        htmlFor="raw-ai-output"
+      >
         Output IA grezzo
       </label>
       <textarea
+        id="raw-ai-output"
         className="mt-2 h-[360px] w-full resize-none border border-neutral-800 bg-neutral-950 p-3 font-mono text-xs leading-5 text-neutral-200 outline-none focus:border-red-500"
         value={rawResponse}
         onChange={(event) => onRawResponseChange(event.target.value)}

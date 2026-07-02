@@ -68,15 +68,16 @@ export function MasterTimeline({
         </div>
         <div className="grid grid-cols-3 border border-neutral-800 text-xs">
           {(["Tutti", "Aperti", "Completati"] as const).map((filter) => (
-            <button
-              className={`px-3 py-2 uppercase tracking-widest ${
-                statusFilter === filter
+              <button
+                className={`px-3 py-2 uppercase tracking-widest ${
+                  statusFilter === filter
                   ? "bg-neutral-100 text-neutral-950"
                   : "bg-black text-neutral-400 hover:text-neutral-100"
-              }`}
-              key={filter}
-              type="button"
-              onClick={() => setStatusFilter(filter)}
+                }`}
+                aria-pressed={statusFilter === filter}
+                key={filter}
+                type="button"
+                onClick={() => setStatusFilter(filter)}
             >
               {filter}
             </button>
@@ -139,6 +140,8 @@ export function MasterTimeline({
                     ? "border-neutral-700 bg-neutral-900 text-neutral-400"
                     : "border-neutral-700 bg-neutral-950 text-neutral-100 hover:border-red-700"
                 }`}
+                aria-label={`${isCompleted ? "Riapri" : "Completa"} task ${task.titolo}`}
+                aria-pressed={isCompleted}
                 type="button"
                 onClick={() => toggleTask(task)}
               >

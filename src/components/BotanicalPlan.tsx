@@ -60,6 +60,8 @@ export function BotanicalPlan({
                         ? "border-red-900 bg-red-950/20 text-neutral-100"
                         : "border-neutral-800 bg-black text-neutral-200"
                   }`}
+                  aria-label={`${isCompleted ? "Riapri" : "Completa"} intervento botanico ${intervention.azione}`}
+                  aria-pressed={isCompleted}
                   key={intervention.id}
                   type="button"
                   onClick={() => toggleIntervention(intervention.id)}
@@ -117,10 +119,14 @@ export function BotanicalPlan({
               )}
             </div>
 
-            <label className="mt-4 block text-xs uppercase tracking-widest text-neutral-500">
+            <label
+              className="mt-4 block text-xs uppercase tracking-widest text-neutral-500"
+              htmlFor="botanical-layout-notes"
+            >
               Note layout e flussi
             </label>
             <textarea
+              id="botanical-layout-notes"
               className="mt-2 h-24 w-full resize-none border border-neutral-800 bg-black p-3 text-sm text-neutral-200 outline-none focus:border-red-500"
               value={layoutNotes}
               onBlur={onLayoutNotesCommit}

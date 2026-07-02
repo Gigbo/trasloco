@@ -83,10 +83,11 @@ Legenda stato:
 | --- | --- | --- | --- | --- | --- |
 | S5-001 | Test e2e chat -> dashboard | DONE | Alta | QA / Reliability Engineer | Flusso chat mock -> snapshot -> dati dashboard coperto |
 | S5-002 | Test completamento task critici | TODO | Alta | QA / Reliability Engineer | Conferma obbligatoria verificata |
-| S5-003 | Verifica accessibilita base | TODO | Media | UI/UX Architect | Focus, contrasto e tastiera ok |
+| S5-003 | Verifica accessibilita base | DONE | Media | UI/UX Architect | Focus visibile, label e stati ARIA base aggiunti |
 | S5-004 | Build produzione locale | DONE | Alta | Full-Stack Developer | `pnpm build` passa |
 | S5-005 | Documentare setup e comandi | DONE | Media | Full-Stack Developer | README aggiornato |
 | S5-006 | Estrarre hook da `App.tsx` | DONE | Media | Full-Stack Developer | Provider status e persistenza UI separati in hook dedicati |
+| S5-007 | Controllare installazioni mancanti | DONE | Media | Full-Stack Developer | Audit scritto in `docs/INSTALLATION_AUDIT.md` |
 
 ## Rischi Aperti
 
@@ -123,3 +124,5 @@ Legenda stato:
 | 2026-07-02 | Estrarre `useProviderStatus` e `usePersistedRelocationState` | `App.tsx` deve restare leggibile: compone la dashboard, gli hook gestiscono sensori e salvataggi | Full-Stack Developer |
 | 2026-07-02 | Centralizzare le proiezioni dashboard | Timeline, budget e decluttering condividono funzioni pure testabili invece di duplicare logica nei componenti | QA / Reliability Engineer |
 | 2026-07-02 | Correggere ordinamento Master Timeline | I task devono essere ordinati per `scadenza_giorni_al_trasloco`, non mostrati nell'ordine grezzo dell'LLM | Full-Stack Developer |
+| 2026-07-02 | Non installare Playwright o jsdom finche non servono davvero | Il progetto e stabile con Vitest; tooling browser e component test si aggiungono quando c'e un caso concreto | QA / Reliability Engineer |
+| 2026-07-02 | Aggiungere focus visibile globale e label ai controlli | Tastiera e screen reader devono poter usare i controlli principali senza ambiguita | UI/UX Architect |
