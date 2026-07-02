@@ -322,6 +322,8 @@ Criteri di completamento:
 9. Storico conversazioni e snapshot. DONE
 10. Adattatore LLM con provider mock e Ollama. DONE
 11. Diagnostica provider e fallback UI. DONE
-12. Refactor `App.tsx` in hook dedicati.
-13. Eventuale API cloud.
-14. Test e packaging.
+12. Refactor `App.tsx` in hook dedicati. DONE
+13. Test e2e chat -> dashboard.
+14. Verifica accessibilita base.
+15. Eventuale API cloud.
+16. Test e packaging.

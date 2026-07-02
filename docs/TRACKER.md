@@ -86,6 +86,7 @@ Legenda stato:
 | S5-003 | Verifica accessibilita base | TODO | Media | UI/UX Architect | Focus, contrasto e tastiera ok |
 | S5-004 | Build produzione locale | DONE | Alta | Full-Stack Developer | `pnpm build` passa |
 | S5-005 | Documentare setup e comandi | DONE | Media | Full-Stack Developer | README aggiornato |
+| S5-006 | Estrarre hook da `App.tsx` | DONE | Media | Full-Stack Developer | Provider status e persistenza UI separati in hook dedicati |
 
 ## Rischi Aperti
 
@@ -119,3 +120,4 @@ Legenda stato:
 | 2026-07-02 | Usare `gemma4:latest` come modello Ollama consigliato | Test reale riuscito con `snapshotSaved=true` e contenuto piu coerente con l'Inquisitore Logistico | LLM Integration Engineer |
 | 2026-07-02 | Mostrare provider e modello nella Console Interrogatoria | L'utente deve capire subito se sta usando mock o Ollama/Gemma senza leggere `.env` | Full-Stack Developer |
 | 2026-07-02 | Restituire 502 esplicito quando il provider LLM fallisce | Un errore Ollama deve essere leggibile e non sembrare un crash generico del backend | QA / Reliability Engineer |
+| 2026-07-02 | Estrarre `useProviderStatus` e `usePersistedRelocationState` | `App.tsx` deve restare leggibile: compone la dashboard, gli hook gestiscono sensori e salvataggi | Full-Stack Developer |

@@ -6,78 +6,78 @@ Data: 2026-07-02
 
 Obiettivo della sessione:
 
-- rendere visibile nella UI quale provider LLM e attivo;
-- mostrare il modello in uso, per esempio `gemma4:latest`;
-- trasformare gli errori del provider LLM in risposte leggibili;
-- aggiornare tracker e documentazione per la prossima sessione.
+- alleggerire `src/App.tsx`;
+- separare la diagnostica provider in un hook dedicato;
+- separare caricamento e salvataggi SQLite in un hook dedicato;
+- mantenere invariato il comportamento visibile della dashboard.
 
 ## Decisioni Prese
 
-- `/api/health` restituisce anche `model`, oltre a `provider`.
-- Ogni `LlmProvider` puo dichiarare un `model`.
-- Il provider `mock` dichiara `fixture`.
-- Il provider `ollama` dichiara il valore di `OLLAMA_MODEL`.
-- Se il provider LLM fallisce durante `/api/chat`, il backend risponde con HTTP `502` e messaggio leggibile.
-- La Console Interrogatoria legge `/api/health` e mostra stato, motore e modello.
-- Lo stato iniziale della console e neutro finche il backend non conferma il provider reale.
+- `src/App.tsx` deve restare principalmente il punto di composizione della UI.
+- La diagnostica `/api/health` vive in `useProviderStatus`.
+- Stato operativo, storico, snapshot, salvataggi SQLite e mutazioni utente vivono in `usePersistedRelocationState`.
+- Non sono state introdotte nuove dipendenze.
+- Non sono stati cambiati schema LLM, API backend o database.
 
 ## File Aggiornati
 
-- `server/llm/types.ts`
-- `server/llm/mock-provider.ts`
-- `server/llm/ollama-provider.ts`
-- `server/app.ts`
-- `server/app.test.ts`
-- `src/lib/api-types.ts`
 - `src/App.tsx`
-- `src/components/InterrogationConsole.tsx`
-- `README.md`
+- `src/hooks/useProviderStatus.ts`
+- `src/hooks/usePersistedRelocationState.ts`
 - `docs/ROADMAP.md`
 - `docs/TRACKER.md`
 - `docs/SESSION_BRIEF.md`
 
 ## Stato Attuale
 
-- Provider `mock` funzionante.
-- Provider `ollama` funzionante con `gemma4:latest` configurato nel `.env` locale.
-- La UI mostra il provider attivo nella Console Interrogatoria.
-- Gli errori Ollama non vengono piu nascosti dietro un 500 generico.
-- Il parser resta il punto di difesa: una risposta LLM non conforme non rompe la dashboard.
+- `App.tsx` compone Console, Timeline, Budget, Decluttering, Botanica e pannelli rischio.
+- `useProviderStatus` gestisce provider, modello e stato health.
+- `usePersistedRelocationState` gestisce:
+  - risposta grezza LLM;
+  - messaggio utente;
+  - storico conversazioni;
+  - snapshot validati;
+  - task completati;
+  - decisioni decluttering;
+  - override costi;
+  - checklist e note botaniche;
+  - salvataggi verso SQLite.
+- Provider `ollama` con `gemma4:latest` resta la configurazione locale consigliata.
+- Provider `mock` resta la modalita stabile per sviluppo e test.
 
 ## Controllo Qualita Sessione
 
 Errori trovati:
 
-- I comandi `pnpm test` e `pnpm typecheck` inizialmente non trovavano `node` nel PATH della sessione Codex.
-- Correzione operativa: rilanciati con il PATH del runtime Node di Codex.
-- Nessun errore TypeScript dopo le modifiche.
+- Nessun errore TypeScript dopo il refactor.
 - Nessun test fallito.
+- Nessun whitespace problematico nel diff.
 
 Miglioramenti applicati:
 
-- Diagnostica provider visibile in UI.
-- `/api/health` piu informativo.
-- Fallback provider testato con un caso di errore Ollama.
-- Alcune note obsolete della roadmap sono state corrette: task, decluttering e botanica sono gia persistiti.
+- `App.tsx` e molto piu leggibile.
+- La logica di health check e riutilizzabile.
+- La logica di persistenza e isolata: sara piu facile testarla o modificarla senza toccare la UI.
 
 Verifiche eseguite:
 
 - `pnpm test`: 21 test passanti.
 - `pnpm typecheck`: completato senza errori.
 - `pnpm build`: completato senza errori.
+- `git diff --check`: completato senza errori.
 
 ## Prossima Sessione Consigliata
 
 Obiettivo:
 
-- alleggerire `src/App.tsx` estraendo hook dedicati per stato remoto e persistenza UI.
+- aggiungere il primo test end-to-end del flusso principale.
 
 Passi consigliati:
 
-1. Creare `src/hooks/useProviderStatus.ts` per `/api/health`.
-2. Creare `src/hooks/usePersistedRelocationState.ts` per `/api/state` e salvataggi SQLite.
-3. Lasciare `App.tsx` come orchestratore dei moduli, non come contenitore di tutta la logica.
-4. Aggiungere test mirati sugli hook se la complessita cresce.
+1. Configurare un test e2e leggero per `chat -> parsing -> dashboard`.
+2. Usare provider `mock` per avere output stabile.
+3. Verificare che una risposta valida aggiorni Timeline, Budget e Decluttering.
+4. Dopo il test e2e, fare una verifica accessibilita base su focus e tastiera.
 
 ## Promemoria Operativo
 
