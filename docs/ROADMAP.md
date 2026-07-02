@@ -154,7 +154,7 @@ Stato attuale:
 - timeline UI creata;
 - priorita e criticita visibili;
 - conferma per task critici presente;
-- completamenti non ancora persistiti.
+- completamenti persistiti in SQLite.
 
 ## Fase 5 - Cruscotto Finanziario
 
@@ -216,7 +216,7 @@ Stato attuale:
 
 - coda decluttering creata;
 - azioni Vendere, Donare, Buttare presenti;
-- decisioni non ancora persistite.
+- decisioni persistite in SQLite.
 
 ## Fase 7 - Planimetria Botanica
 
@@ -247,7 +247,7 @@ Stato attuale:
 
 - checklist botanica creata;
 - griglia 4x2m e terrazzo presenti;
-- note locali non ancora persistite.
+- checklist e note layout persistite in SQLite.
 
 ## Fase 8 - Persistenza Snapshot E Recupero Stato
 
@@ -321,6 +321,7 @@ Criteri di completamento:
 8. Persistenza completa locale. DONE
 9. Storico conversazioni e snapshot. DONE
 10. Adattatore LLM con provider mock e Ollama. DONE
-11. Diagnostica provider e fallback UI.
-12. Eventuale API cloud.
-13. Test e packaging.
+11. Diagnostica provider e fallback UI. DONE
+12. Refactor `App.tsx` in hook dedicati.
+13. Eventuale API cloud.
+14. Test e packaging.

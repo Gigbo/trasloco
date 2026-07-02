@@ -1,9 +1,14 @@
-import type { ConversationPayload, SnapshotPayload } from "../lib/api-types";
+import type {
+  ConversationPayload,
+  ProviderStatusPayload,
+  SnapshotPayload
+} from "../lib/api-types";
 
 type InterrogationConsoleProps = {
   message: string;
   rawResponse: string;
   apiStatus: string;
+  providerStatus: ProviderStatusPayload;
   isLoading: boolean;
   persistedItems: number;
   conversations: ConversationPayload[];
@@ -21,6 +26,7 @@ export function InterrogationConsole({
   message,
   rawResponse,
   apiStatus,
+  providerStatus,
   isLoading,
   persistedItems,
   conversations,
@@ -40,9 +46,37 @@ export function InterrogationConsole({
       </p>
       <h1 className="mt-3 text-2xl font-semibold">Relocation Manager</h1>
       <p className="mt-3 text-sm leading-6 text-neutral-400">
-        Console tecnica. Interroga il backend mock, valida il JSON e trasforma il
+        Console tecnica. Interroga il provider LLM, valida il JSON e trasforma il
         modulo IA in dashboard operativa.
       </p>
+
+      <section className="mt-5 border border-neutral-800 bg-neutral-950 p-3">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs font-semibold uppercase text-neutral-500">
+            Provider LLM
+          </p>
+          <span
+            className={`border px-2 py-1 text-xs font-semibold uppercase ${
+              providerStatus.status === "ok"
+                ? "border-emerald-800 text-emerald-300"
+                : "border-red-900 text-red-300"
+            }`}
+          >
+            {providerStatus.status}
+          </span>
+        </div>
+        <dl className="mt-3 grid grid-cols-[84px_1fr] gap-x-3 gap-y-2 text-xs">
+          <dt className="text-neutral-600">Motore</dt>
+          <dd className="font-mono text-neutral-300">{providerStatus.provider}</dd>
+          <dt className="text-neutral-600">Modello</dt>
+          <dd className="font-mono text-neutral-300">
+            {providerStatus.model ?? "non dichiarato"}
+          </dd>
+        </dl>
+        {providerStatus.detail ? (
+          <p className="mt-3 text-xs leading-5 text-red-300">{providerStatus.detail}</p>
+        ) : null}
+      </section>
 
       <label className="mt-6 block text-xs font-semibold uppercase text-neutral-500">
         Console interrogatoria

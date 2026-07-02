@@ -14,6 +14,7 @@ export function createOllamaProvider(): LlmProvider {
 
   return {
     name: "ollama",
+    model,
     async chat(request: ChatRequest): Promise<ChatResponse> {
       const response = await fetch(`${baseUrl}/api/generate`, {
         method: "POST",

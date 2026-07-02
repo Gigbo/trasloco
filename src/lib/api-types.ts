@@ -41,6 +41,15 @@ export type SnapshotPayload = {
   payload: RelocationData;
 };
 
+export type ProviderStatusPayload = {
+  status: "ok" | "offline" | "unknown";
+  service?: string;
+  provider: string;
+  model: string | null;
+  timestamp?: string;
+  detail?: string;
+};
+
 export type AppStatePayload = {
   latestSnapshot?: SnapshotPayload | null;
   recentSnapshots?: SnapshotPayload[];

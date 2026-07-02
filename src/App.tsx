@@ -10,6 +10,7 @@ import type {
   AppStatePayload,
   ConversationPayload,
   DeclutteringAction,
+  ProviderStatusPayload,
   SnapshotPayload
 } from "./lib/api-types";
 import { validRelocationResponse } from "./fixtures/demo-response";
@@ -19,7 +20,12 @@ export default function App() {
   const [message, setMessage] = useState(
     "Ho un trasloco da organizzare e devo capire priorita, costi e cosa eliminare."
   );
-  const [apiStatus, setApiStatus] = useState<string>("Provider mock pronto.");
+  const [apiStatus, setApiStatus] = useState<string>("Backend in verifica...");
+  const [providerStatus, setProviderStatus] = useState<ProviderStatusPayload>({
+    status: "unknown",
+    provider: "sconosciuto",
+    model: null
+  });
   const [persistedItems, setPersistedItems] = useState(0);
   const [conversations, setConversations] = useState<ConversationPayload[]>([]);
   const [snapshots, setSnapshots] = useState<SnapshotPayload[]>([]);
@@ -67,8 +73,39 @@ export default function App() {
       }
     }
 
+    void loadProviderStatus();
     void loadPersistedState();
   }, []);
+
+  async function loadProviderStatus() {
+    try {
+      const response = await fetch("/api/health");
+
+      if (!response.ok) {
+        throw new Error(`Health check fallito con HTTP ${response.status}.`);
+      }
+
+      const payload = (await response.json()) as Partial<ProviderStatusPayload>;
+
+      setProviderStatus({
+        status: "ok",
+        service: payload.service,
+        provider: payload.provider ?? "sconosciuto",
+        model: payload.model ?? null,
+        timestamp: payload.timestamp
+      });
+    } catch (error) {
+      setProviderStatus({
+        status: "offline",
+        provider: "backend offline",
+        model: null,
+        detail:
+          error instanceof Error
+            ? error.message
+            : "Health check non raggiungibile."
+      });
+    }
+  }
 
   async function interrogateBackend() {
     setIsLoading(true);
@@ -131,8 +168,10 @@ export default function App() {
           payload.snapshotSaved ? "salvato" : "non salvato"
         }.`
       );
+      void loadProviderStatus();
     } catch (error) {
       setApiStatus(error instanceof Error ? error.message : "Errore API sconosciuto.");
+      void loadProviderStatus();
     } finally {
       setIsLoading(false);
     }
@@ -336,6 +375,7 @@ export default function App() {
           message={message}
           rawResponse={rawResponse}
           apiStatus={apiStatus}
+          providerStatus={providerStatus}
           isLoading={isLoading}
           persistedItems={persistedItems}
           conversations={conversations}

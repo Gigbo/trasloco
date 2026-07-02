@@ -54,6 +54,7 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
       status: "ok",
       service: "relocation-manager-api",
       provider: llmProvider.name,
+      model: llmProvider.model ?? null,
       timestamp: new Date().toISOString()
     };
   });
@@ -68,7 +69,20 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
       });
     }
 
-    const response = await llmProvider.chat(parsed.data);
+    let response;
+
+    try {
+      response = await llmProvider.chat(parsed.data);
+    } catch (error) {
+      return reply.status(502).send({
+        error: "Provider LLM non disponibile.",
+        detail:
+          error instanceof Error
+            ? error.message
+            : "Errore sconosciuto durante la chiamata al provider LLM."
+      });
+    }
+
     const conversation = persistence.saveConversation({
       userMessage: parsed.data.message,
       assistantText: response.assistantText,

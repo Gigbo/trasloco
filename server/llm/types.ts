@@ -11,5 +11,6 @@ export type ChatResponse = {
 
 export type LlmProvider = {
   name: LlmProviderName;
+  model?: string;
   chat(request: ChatRequest): Promise<ChatResponse>;
 };

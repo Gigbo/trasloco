@@ -50,7 +50,35 @@ describe("backend API", () => {
     expect(response.json()).toMatchObject({
       status: "ok",
       service: "relocation-manager-api",
-      provider: "mock"
+      provider: "mock",
+      model: null
+    });
+
+    await app.close();
+  });
+
+  it("returns a clear 502 when the LLM provider fails", async () => {
+    const failingProvider: LlmProvider = {
+      name: "ollama",
+      model: "gemma4:latest",
+      async chat() {
+        throw new Error("Ollama non raggiungibile su http://127.0.0.1:11434.");
+      }
+    };
+    const app = buildTestApp(failingProvider);
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/api/chat",
+      payload: {
+        message: "Genera piano operativo"
+      }
+    });
+
+    expect(response.statusCode).toBe(502);
+    expect(response.json()).toMatchObject({
+      error: "Provider LLM non disponibile.",
+      detail: "Ollama non raggiungibile su http://127.0.0.1:11434."
     });
 
     await app.close();

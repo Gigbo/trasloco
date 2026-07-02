@@ -6,79 +6,78 @@ Data: 2026-07-02
 
 Obiettivo della sessione:
 
-- implementare l'adattatore Ollama locale;
-- mantenere il provider `mock` come modalita stabile per sviluppo e test;
-- rendere comprensibile la configurazione anche a chi non programma;
-- aggiungere test sul comportamento del provider Ollama.
+- rendere visibile nella UI quale provider LLM e attivo;
+- mostrare il modello in uso, per esempio `gemma4:latest`;
+- trasformare gli errori del provider LLM in risposte leggibili;
+- aggiornare tracker e documentazione per la prossima sessione.
 
 ## Decisioni Prese
 
-- `LLM_PROVIDER=mock` resta la modalita predefinita.
-- `LLM_PROVIDER=ollama` usa `POST /api/generate` su `OLLAMA_BASE_URL`.
-- La chiamata Ollama usa `stream: false` per ricevere una singola risposta.
-- La chiamata Ollama usa JSON Schema structured output e un prompt vincolato allo schema `RelocationSchema`.
-- Se Ollama non e raggiungibile, il backend restituisce un errore chiaro invece di fallire in modo opaco.
+- `/api/health` restituisce anche `model`, oltre a `provider`.
+- Ogni `LlmProvider` puo dichiarare un `model`.
+- Il provider `mock` dichiara `fixture`.
+- Il provider `ollama` dichiara il valore di `OLLAMA_MODEL`.
+- Se il provider LLM fallisce durante `/api/chat`, il backend risponde con HTTP `502` e messaggio leggibile.
+- La Console Interrogatoria legge `/api/health` e mostra stato, motore e modello.
+- Lo stato iniziale della console e neutro finche il backend non conferma il provider reale.
 
 ## File Aggiornati
 
+- `server/llm/types.ts`
+- `server/llm/mock-provider.ts`
 - `server/llm/ollama-provider.ts`
-- `server/llm/ollama-provider.test.ts`
-- `server/llm/provider.ts`
-- `server/env.ts`
-- `server/env.test.ts`
-- `server/index.ts`
-- `.env.example`
+- `server/app.ts`
+- `server/app.test.ts`
+- `src/lib/api-types.ts`
+- `src/App.tsx`
+- `src/components/InterrogationConsole.tsx`
 - `README.md`
-- `docs/GUIDA_NON_TECNICA.md`
+- `docs/ROADMAP.md`
 - `docs/TRACKER.md`
 - `docs/SESSION_BRIEF.md`
 
 ## Stato Attuale
 
 - Provider `mock` funzionante.
-- Provider `ollama` implementato.
-- Il backend carica automaticamente `.env` se presente.
-- `.env.example` contiene `OLLAMA_BASE_URL` e `OLLAMA_MODEL=gemma4:latest`.
-- `.env` locale e configurato su `LLM_PROVIDER=ollama` e `OLLAMA_MODEL=gemma4:latest`.
-- Ollama e stato verificato sul Mac prima con `llama3.2:latest`, poi con `gemma4:latest`.
-- `gemma4:latest` e piu lento ma ha prodotto un piano migliore e `snapshotSaved=true`.
-- Il parser continua a validare la risposta: anche se Ollama produce JSON imperfetto, la dashboard non deve fidarsi ciecamente.
+- Provider `ollama` funzionante con `gemma4:latest` configurato nel `.env` locale.
+- La UI mostra il provider attivo nella Console Interrogatoria.
+- Gli errori Ollama non vengono piu nascosti dietro un 500 generico.
+- Il parser resta il punto di difesa: una risposta LLM non conforme non rompe la dashboard.
 
 ## Controllo Qualita Sessione
 
 Errori trovati:
 
-- Nessun errore TypeScript dopo l'aggiunta del provider.
+- I comandi `pnpm test` e `pnpm typecheck` inizialmente non trovavano `node` nel PATH della sessione Codex.
+- Correzione operativa: rilanciati con il PATH del runtime Node di Codex.
+- Nessun errore TypeScript dopo le modifiche.
 - Nessun test fallito.
-- La prima prova reale Ollama ha prodotto JSON incompleto; il provider e stato irrigidito con JSON Schema.
-- La seconda prova reale Ollama ha salvato correttamente uno snapshot.
-- La prova reale con `gemma4:latest` ha salvato correttamente uno snapshot.
 
-Miglioramenti proposti:
+Miglioramenti applicati:
 
-- Aggiungere un controllo visibile in UI per indicare quale provider e attivo.
-- Aggiungere un pulsante o pannello diagnostico per verificare se Ollama risponde.
-- Estrarre la persistenza dei moduli UI in un hook dedicato per alleggerire `App.tsx`.
+- Diagnostica provider visibile in UI.
+- `/api/health` piu informativo.
+- Fallback provider testato con un caso di errore Ollama.
+- Alcune note obsolete della roadmap sono state corrette: task, decluttering e botanica sono gia persistiti.
 
 Verifiche eseguite:
 
-- `pnpm test`: 20 test passanti.
+- `pnpm test`: 21 test passanti.
 - `pnpm typecheck`: completato senza errori.
-- Prova reale su backend temporaneo `http://127.0.0.1:5194`: `provider=ollama`, `snapshotSaved=true`.
-- Prova reale `gemma4:latest`: `provider=ollama`, `snapshotSaved=true`.
+- `pnpm build`: completato senza errori.
 
 ## Prossima Sessione Consigliata
 
 Obiettivo:
 
-- rendere visibile lo stato provider nella UI e migliorare diagnostica.
+- alleggerire `src/App.tsx` estraendo hook dedicati per stato remoto e persistenza UI.
 
 Passi consigliati:
 
-1. Mostrare provider attivo nella Console Interrogatoria usando `/api/health`.
-2. Mostrare un avviso se provider e `ollama` ma la chiamata fallisce.
-3. Eventualmente aggiungere endpoint diagnostico leggero per Ollama.
-4. Poi refactor di `App.tsx` in hook dedicati.
+1. Creare `src/hooks/useProviderStatus.ts` per `/api/health`.
+2. Creare `src/hooks/usePersistedRelocationState.ts` per `/api/state` e salvataggi SQLite.
+3. Lasciare `App.tsx` come orchestratore dei moduli, non come contenitore di tutta la logica.
+4. Aggiungere test mirati sugli hook se la complessita cresce.
 
 ## Promemoria Operativo
 

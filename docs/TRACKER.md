@@ -20,7 +20,7 @@ Legenda stato:
 | Frontend shell | DONE | UI/UX Architect | Dashboard operativa con moduli principali creata |
 | Backend locale | DONE | Full-Stack Developer | Fastify con `/api/health` e `/api/chat` mock |
 | Persistenza SQLite | DONE | Full-Stack Developer | Conversazioni, snapshot e decisioni utente granulari salvati |
-| Test parser | DONE | QA / Reliability Engineer | 20 test totali passano, inclusi parser, backend, env loader e provider Ollama |
+| Test parser | DONE | QA / Reliability Engineer | 21 test totali passano, inclusi parser, backend, env loader, provider Ollama e fallback provider |
 
 ## Sprint 0 - Setup E Direzione
 
@@ -75,7 +75,7 @@ Legenda stato:
 | S4-002 | Salvare snapshot JSON validi | DONE | Alta | Full-Stack Developer | Snapshot recuperabili da `/api/state` e `/api/snapshots` |
 | S4-003 | Integrare API LLM server-side | DONE | Alta | LLM Integration Engineer | Provider mock e Ollama server-side attivi; API cloud opzionale futura |
 | S4-004 | Ripristinare ultimo stato al refresh | DONE | Alta | Full-Stack Developer | Ultimo snapshot e stati utente granulari caricati da SQLite |
-| S4-005 | Gestire fallback su errore LLM | TODO | Media | QA / Reliability Engineer | UI degradata ma usabile |
+| S4-005 | Gestire fallback su errore LLM | DONE | Media | QA / Reliability Engineer | Backend restituisce 502 leggibile e UI mantiene dashboard usabile |
 
 ## Sprint 5 - Hardening
 
@@ -91,7 +91,7 @@ Legenda stato:
 
 | Rischio | Impatto | Mitigazione | Stato |
 | --- | --- | --- | --- |
-| Output LLM non conforme | Alto | Zod, fixture, ParseErrorPanel | TODO |
+| Output LLM non conforme | Alto | Zod, fixture, ParseErrorPanel | DONE |
 | Scope creep UI | Medio | Roadmap modulare e brutalismo funzionale | TODO |
 | Perdita dati locali | Alto | SQLite, snapshot versionati e stato utente separato | DONE |
 | API key esposta | Alto | Solo backend locale legge `.env` | TODO |
@@ -117,3 +117,5 @@ Legenda stato:
 | 2026-07-02 | Rendere selezionabile lo storico snapshot validato | I piani operativi validi devono essere recuperabili separatamente dal testo grezzo delle conversazioni | Full-Stack Developer |
 | 2026-07-02 | Implementare provider Ollama locale | Permette usare un modello installato sul Mac mantenendo il provider mock come modalita stabile | LLM Integration Engineer |
 | 2026-07-02 | Usare `gemma4:latest` come modello Ollama consigliato | Test reale riuscito con `snapshotSaved=true` e contenuto piu coerente con l'Inquisitore Logistico | LLM Integration Engineer |
+| 2026-07-02 | Mostrare provider e modello nella Console Interrogatoria | L'utente deve capire subito se sta usando mock o Ollama/Gemma senza leggere `.env` | Full-Stack Developer |
+| 2026-07-02 | Restituire 502 esplicito quando il provider LLM fallisce | Un errore Ollama deve essere leggibile e non sembrare un crash generico del backend | QA / Reliability Engineer |

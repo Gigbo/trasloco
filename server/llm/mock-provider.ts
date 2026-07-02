@@ -7,6 +7,7 @@ const fixturePath = resolve(process.cwd(), "fixtures/llm/valid-response.txt");
 export function createMockProvider(): LlmProvider {
   return {
     name: "mock",
+    model: "fixture",
     async chat(request: ChatRequest): Promise<ChatResponse> {
       const fixture = await readFile(fixturePath, "utf8");
       const assistantText = [
