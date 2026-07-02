@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { DeclutteringAction } from "../lib/api-types";
+import { getPendingDeclutteringItems } from "../lib/dashboard-projections";
 import type { DeclutteringItem } from "../lib/relocation-schema";
 
 type DeclutteringGraveyardProps = {
@@ -19,7 +20,7 @@ export function DeclutteringGraveyard({
   decisions,
   onDecision
 }: DeclutteringGraveyardProps) {
-  const currentItem = items.find((item) => !decisions[item.id]);
+  const currentItem = getPendingDeclutteringItems(items, decisions)[0];
   const decidedCount = Object.keys(decisions).length;
 
   const summary = useMemo(() => {

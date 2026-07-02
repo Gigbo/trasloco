@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { getSortedTimelineTasks } from "../lib/dashboard-projections";
 import type { TaskLogistico } from "../lib/relocation-schema";
 
 type MasterTimelineProps = {
@@ -23,7 +24,7 @@ export function MasterTimeline({
   );
 
   const visibleTasks = useMemo(() => {
-    return tasks.filter((task) => {
+    return getSortedTimelineTasks(tasks).filter((task) => {
       const isCompleted = completedTaskIds.has(task.id);
 
       if (statusFilter === "Aperti") {

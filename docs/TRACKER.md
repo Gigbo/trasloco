@@ -20,7 +20,7 @@ Legenda stato:
 | Frontend shell | DONE | UI/UX Architect | Dashboard operativa con moduli principali creata |
 | Backend locale | DONE | Full-Stack Developer | Fastify con `/api/health` e `/api/chat` mock |
 | Persistenza SQLite | DONE | Full-Stack Developer | Conversazioni, snapshot e decisioni utente granulari salvati |
-| Test parser | DONE | QA / Reliability Engineer | 21 test totali passano, inclusi parser, backend, env loader, provider Ollama e fallback provider |
+| Test parser | DONE | QA / Reliability Engineer | 22 test totali passano, inclusi parser, backend, env loader, provider Ollama, fallback provider ed e2e dati dashboard |
 
 ## Sprint 0 - Setup E Direzione
 
@@ -81,7 +81,7 @@ Legenda stato:
 
 | ID | Task | Stato | Priorita | Owner | Criterio di completamento |
 | --- | --- | --- | --- | --- | --- |
-| S5-001 | Test e2e chat -> dashboard | TODO | Alta | QA / Reliability Engineer | Flusso principale coperto |
+| S5-001 | Test e2e chat -> dashboard | DONE | Alta | QA / Reliability Engineer | Flusso chat mock -> snapshot -> dati dashboard coperto |
 | S5-002 | Test completamento task critici | TODO | Alta | QA / Reliability Engineer | Conferma obbligatoria verificata |
 | S5-003 | Verifica accessibilita base | TODO | Media | UI/UX Architect | Focus, contrasto e tastiera ok |
 | S5-004 | Build produzione locale | DONE | Alta | Full-Stack Developer | `pnpm build` passa |
@@ -121,3 +121,5 @@ Legenda stato:
 | 2026-07-02 | Mostrare provider e modello nella Console Interrogatoria | L'utente deve capire subito se sta usando mock o Ollama/Gemma senza leggere `.env` | Full-Stack Developer |
 | 2026-07-02 | Restituire 502 esplicito quando il provider LLM fallisce | Un errore Ollama deve essere leggibile e non sembrare un crash generico del backend | QA / Reliability Engineer |
 | 2026-07-02 | Estrarre `useProviderStatus` e `usePersistedRelocationState` | `App.tsx` deve restare leggibile: compone la dashboard, gli hook gestiscono sensori e salvataggi | Full-Stack Developer |
+| 2026-07-02 | Centralizzare le proiezioni dashboard | Timeline, budget e decluttering condividono funzioni pure testabili invece di duplicare logica nei componenti | QA / Reliability Engineer |
+| 2026-07-02 | Correggere ordinamento Master Timeline | I task devono essere ordinati per `scadenza_giorni_al_trasloco`, non mostrati nell'ordine grezzo dell'LLM | Full-Stack Developer |

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { calculateBudgetTotal } from "../lib/dashboard-projections";
 import type { VoceCosto } from "../lib/relocation-schema";
 
 type FinancialDashboardProps = {
@@ -19,7 +20,7 @@ export function FinancialDashboard({
   onOverrideChange
 }: FinancialDashboardProps) {
   const total = useMemo(() => {
-    return costs.reduce((sum, cost) => sum + (overrides[cost.id] ?? cost.stima_eur), 0);
+    return calculateBudgetTotal(costs, overrides);
   }, [costs, overrides]);
 
   function updateCost(cost: VoceCosto, value: string) {
