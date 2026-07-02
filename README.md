@@ -233,7 +233,7 @@ Configurazione Ollama:
 ```bash
 LLM_PROVIDER=ollama
 OLLAMA_BASE_URL=http://127.0.0.1:11434
-OLLAMA_MODEL=llama3.2:latest
+OLLAMA_MODEL=gemma4:latest
 ```
 
 Il backend carica automaticamente il file locale `.env` se esiste. `.env` non viene salvato su Git.
@@ -241,11 +241,11 @@ Il backend carica automaticamente il file locale `.env` se esiste. `.env` non vi
 Prima di usare `ollama`, il servizio Ollama deve essere attivo e il modello deve essere disponibile localmente. Esempio:
 
 ```bash
-ollama pull llama3.2:latest
+ollama pull gemma4:latest
 ollama serve
 ```
 
-Nel Mac di sviluppo attuale e stato configurato `llama3.2:latest`, gia presente localmente. Se Ollama non risponde, il backend restituisce un errore esplicito. Per tornare allo sviluppo stabile basta rimettere `LLM_PROVIDER=mock`.
+Nel Mac di sviluppo attuale `gemma4:latest` e stato verificato con `snapshotSaved=true`. `llama3.2:latest` resta una buona alternativa piu leggera e veloce. Se Ollama non risponde, il backend restituisce un errore esplicito. Per tornare allo sviluppo stabile basta rimettere `LLM_PROVIDER=mock`.
 
 ## Persistenza Locale
 

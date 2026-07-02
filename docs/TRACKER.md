@@ -116,3 +116,4 @@ Legenda stato:
 | 2026-07-02 | Rendere lo storico conversazioni visibile nella Console Interrogatoria | L'utente deve poter recuperare risposte precedenti senza aprire SQLite o leggere JSON grezzo nel database | Full-Stack Developer |
 | 2026-07-02 | Rendere selezionabile lo storico snapshot validato | I piani operativi validi devono essere recuperabili separatamente dal testo grezzo delle conversazioni | Full-Stack Developer |
 | 2026-07-02 | Implementare provider Ollama locale | Permette usare un modello installato sul Mac mantenendo il provider mock come modalita stabile | LLM Integration Engineer |
+| 2026-07-02 | Usare `gemma4:latest` come modello Ollama consigliato | Test reale riuscito con `snapshotSaved=true` e contenuto piu coerente con l'Inquisitore Logistico | LLM Integration Engineer |

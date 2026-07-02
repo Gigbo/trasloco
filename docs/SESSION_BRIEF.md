@@ -38,9 +38,10 @@ Obiettivo della sessione:
 - Provider `mock` funzionante.
 - Provider `ollama` implementato.
 - Il backend carica automaticamente `.env` se presente.
-- `.env.example` contiene `OLLAMA_BASE_URL` e `OLLAMA_MODEL=llama3.2:latest`.
-- `.env` locale e configurato su `LLM_PROVIDER=ollama`.
-- Ollama e stato verificato sul Mac con `llama3.2:latest`.
+- `.env.example` contiene `OLLAMA_BASE_URL` e `OLLAMA_MODEL=gemma4:latest`.
+- `.env` locale e configurato su `LLM_PROVIDER=ollama` e `OLLAMA_MODEL=gemma4:latest`.
+- Ollama e stato verificato sul Mac prima con `llama3.2:latest`, poi con `gemma4:latest`.
+- `gemma4:latest` e piu lento ma ha prodotto un piano migliore e `snapshotSaved=true`.
 - Il parser continua a validare la risposta: anche se Ollama produce JSON imperfetto, la dashboard non deve fidarsi ciecamente.
 
 ## Controllo Qualita Sessione
@@ -51,6 +52,7 @@ Errori trovati:
 - Nessun test fallito.
 - La prima prova reale Ollama ha prodotto JSON incompleto; il provider e stato irrigidito con JSON Schema.
 - La seconda prova reale Ollama ha salvato correttamente uno snapshot.
+- La prova reale con `gemma4:latest` ha salvato correttamente uno snapshot.
 
 Miglioramenti proposti:
 
@@ -63,6 +65,7 @@ Verifiche eseguite:
 - `pnpm test`: 20 test passanti.
 - `pnpm typecheck`: completato senza errori.
 - Prova reale su backend temporaneo `http://127.0.0.1:5194`: `provider=ollama`, `snapshotSaved=true`.
+- Prova reale `gemma4:latest`: `provider=ollama`, `snapshotSaved=true`.
 
 ## Prossima Sessione Consigliata
 
