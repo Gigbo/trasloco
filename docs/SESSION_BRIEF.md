@@ -16,7 +16,7 @@ Obiettivo della sessione:
 - `LLM_PROVIDER=mock` resta la modalita predefinita.
 - `LLM_PROVIDER=ollama` usa `POST /api/generate` su `OLLAMA_BASE_URL`.
 - La chiamata Ollama usa `stream: false` per ricevere una singola risposta.
-- La chiamata Ollama usa `format: "json"` e un prompt vincolato allo schema `RelocationSchema`.
+- La chiamata Ollama usa JSON Schema structured output e un prompt vincolato allo schema `RelocationSchema`.
 - Se Ollama non e raggiungibile, il backend restituisce un errore chiaro invece di fallire in modo opaco.
 
 ## File Aggiornati
@@ -24,6 +24,10 @@ Obiettivo della sessione:
 - `server/llm/ollama-provider.ts`
 - `server/llm/ollama-provider.test.ts`
 - `server/llm/provider.ts`
+- `server/env.ts`
+- `server/env.test.ts`
+- `server/index.ts`
+- `.env.example`
 - `README.md`
 - `docs/GUIDA_NON_TECNICA.md`
 - `docs/TRACKER.md`
@@ -33,8 +37,10 @@ Obiettivo della sessione:
 
 - Provider `mock` funzionante.
 - Provider `ollama` implementato.
-- `.env.example` contiene gia `OLLAMA_BASE_URL` e `OLLAMA_MODEL`.
-- Per usare Ollama serve avere Ollama avviato sul Mac e il modello scaricato.
+- Il backend carica automaticamente `.env` se presente.
+- `.env.example` contiene `OLLAMA_BASE_URL` e `OLLAMA_MODEL=llama3.2:latest`.
+- `.env` locale e configurato su `LLM_PROVIDER=ollama`.
+- Ollama e stato verificato sul Mac con `llama3.2:latest`.
 - Il parser continua a validare la risposta: anche se Ollama produce JSON imperfetto, la dashboard non deve fidarsi ciecamente.
 
 ## Controllo Qualita Sessione
@@ -43,6 +49,8 @@ Errori trovati:
 
 - Nessun errore TypeScript dopo l'aggiunta del provider.
 - Nessun test fallito.
+- La prima prova reale Ollama ha prodotto JSON incompleto; il provider e stato irrigidito con JSON Schema.
+- La seconda prova reale Ollama ha salvato correttamente uno snapshot.
 
 Miglioramenti proposti:
 
@@ -52,8 +60,9 @@ Miglioramenti proposti:
 
 Verifiche eseguite:
 
-- `pnpm test`: 18 test passanti.
+- `pnpm test`: 20 test passanti.
 - `pnpm typecheck`: completato senza errori.
+- Prova reale su backend temporaneo `http://127.0.0.1:5194`: `provider=ollama`, `snapshotSaved=true`.
 
 ## Prossima Sessione Consigliata
 

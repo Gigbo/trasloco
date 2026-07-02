@@ -24,7 +24,7 @@ export function createOllamaProvider(): LlmProvider {
           model,
           prompt: buildRelocationPrompt(request.message),
           stream: false,
-          format: "json",
+          format: relocationJsonSchema,
           options: {
             temperature: 0.2
           }
@@ -192,6 +192,284 @@ Vincoli obbligatori:
 - Usa solo valori enum validi.
 - Inserisci almeno 2 task logistici, 1 voce costo, 1 oggetto decluttering, 1 intervento botanico.
 - Mantieni range_min_eur <= stima_eur <= range_max_eur.
+- Ogni cella del giardino deve includere sempre x, y, uso_suggerito e note.
 - Il tono deve essere operativo e severo, ma il contenuto deve restare utile.
 `.trim();
 }
+
+const relocationJsonSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: [
+    "schema_version",
+    "snapshot_id",
+    "created_at",
+    "fase_trasloco",
+    "sintesi_operativa",
+    "task_logistici",
+    "analisi_costi",
+    "verdetto_decluttering",
+    "logistica_botanica",
+    "domande_aperte",
+    "rischi"
+  ],
+  properties: {
+    schema_version: { const: "1.0.0" },
+    snapshot_id: { type: "string" },
+    created_at: { type: "string" },
+    fase_trasloco: { type: "string" },
+    sintesi_operativa: { type: "string" },
+    task_logistici: {
+      type: "array",
+      minItems: 2,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "id",
+          "titolo",
+          "descrizione",
+          "scadenza_giorni_al_trasloco",
+          "priorita",
+          "categoria",
+          "critico",
+          "criterio_completamento",
+          "stato_suggerito",
+          "dipendenze"
+        ],
+        properties: {
+          id: { type: "string" },
+          titolo: { type: "string" },
+          descrizione: { type: "string" },
+          scadenza_giorni_al_trasloco: { type: "number" },
+          priorita: { enum: ["Alta", "Media", "Bassa"] },
+          categoria: {
+            enum: [
+              "documenti",
+              "imballaggio",
+              "utenze",
+              "trasporto",
+              "casa",
+              "finanze",
+              "altro"
+            ]
+          },
+          critico: { type: "boolean" },
+          criterio_completamento: { type: "string" },
+          stato_suggerito: { enum: ["Da fare", "In corso", "Bloccato", "Completato"] },
+          dipendenze: {
+            type: "array",
+            items: { type: "string" }
+          }
+        }
+      }
+    },
+    analisi_costi: {
+      type: "array",
+      minItems: 1,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "id",
+          "voce_spesa",
+          "categoria",
+          "stima_eur",
+          "range_min_eur",
+          "range_max_eur",
+          "certezza",
+          "strategia_risparmio",
+          "rischio_sforamento"
+        ],
+        properties: {
+          id: { type: "string" },
+          voce_spesa: { type: "string" },
+          categoria: {
+            enum: [
+              "trasporto",
+              "materiali",
+              "manodopera",
+              "deposito",
+              "utenze",
+              "verde",
+              "imprevisti",
+              "altro"
+            ]
+          },
+          stima_eur: { type: "number", minimum: 0 },
+          range_min_eur: { type: "number", minimum: 0 },
+          range_max_eur: { type: "number", minimum: 0 },
+          certezza: { enum: ["Alta", "Media", "Bassa"] },
+          strategia_risparmio: { type: "string" },
+          rischio_sforamento: { enum: ["Alto", "Medio", "Basso"] }
+        }
+      }
+    },
+    verdetto_decluttering: {
+      type: "array",
+      minItems: 1,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "id",
+          "oggetto",
+          "categoria",
+          "domanda_socratica",
+          "azione_consigliata",
+          "motivazione",
+          "valore_stimato_eur",
+          "ingombro",
+          "urgenza_decisione"
+        ],
+        properties: {
+          id: { type: "string" },
+          oggetto: { type: "string" },
+          categoria: {
+            enum: [
+              "mobili",
+              "vestiti",
+              "libri",
+              "cucina",
+              "elettronica",
+              "ricordi",
+              "piante",
+              "altro"
+            ]
+          },
+          domanda_socratica: { type: "string" },
+          azione_consigliata: { enum: ["Vendere", "Donare", "Buttare"] },
+          motivazione: { type: "string" },
+          valore_stimato_eur: { type: "number", minimum: 0 },
+          ingombro: { enum: ["Alto", "Medio", "Basso"] },
+          urgenza_decisione: { enum: ["Alta", "Media", "Bassa"] }
+        }
+      }
+    },
+    logistica_botanica: {
+      type: "object",
+      additionalProperties: false,
+      required: [
+        "interventi_pre_trasloco",
+        "layout_nuovo_spazio",
+        "piante_critiche",
+        "note_generali"
+      ],
+      properties: {
+        interventi_pre_trasloco: {
+          type: "array",
+          minItems: 1,
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["id", "azione", "giorni_prima", "critico", "motivo"],
+            properties: {
+              id: { type: "string" },
+              azione: { type: "string" },
+              giorni_prima: { type: "number" },
+              critico: { type: "boolean" },
+              motivo: { type: "string" }
+            }
+          }
+        },
+        layout_nuovo_spazio: {
+          type: "object",
+          additionalProperties: false,
+          required: ["giardino_4x2", "terrazzo", "flussi_movimento"],
+          properties: {
+            giardino_4x2: {
+              type: "object",
+              additionalProperties: false,
+              required: ["larghezza_m", "profondita_m", "esposizione_solare", "celle"],
+              properties: {
+                larghezza_m: { const: 4 },
+                profondita_m: { const: 2 },
+                esposizione_solare: {
+                  enum: ["Nord", "Sud", "Est", "Ovest", "Mista", "Sconosciuta"]
+                },
+                celle: {
+                  type: "array",
+                  minItems: 1,
+                  items: {
+                    type: "object",
+                    additionalProperties: false,
+                    required: ["x", "y", "uso_suggerito", "note"],
+                    properties: {
+                      x: { type: "integer", minimum: 0 },
+                      y: { type: "integer", minimum: 0 },
+                      uso_suggerito: { type: "string" },
+                      note: { type: "string" }
+                    }
+                  }
+                }
+              }
+            },
+            terrazzo: {
+              type: "object",
+              additionalProperties: false,
+              required: ["esposizione_solare", "vincoli", "uso_suggerito"],
+              properties: {
+                esposizione_solare: {
+                  enum: ["Nord", "Sud", "Est", "Ovest", "Mista", "Sconosciuta"]
+                },
+                vincoli: {
+                  type: "array",
+                  items: { type: "string" }
+                },
+                uso_suggerito: { type: "string" }
+              }
+            },
+            flussi_movimento: {
+              type: "array",
+              items: { type: "string" }
+            }
+          }
+        },
+        piante_critiche: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["id", "nome", "rischio", "azione_preventiva"],
+            properties: {
+              id: { type: "string" },
+              nome: { type: "string" },
+              rischio: { enum: ["Alto", "Medio", "Basso"] },
+              azione_preventiva: { type: "string" }
+            }
+          }
+        },
+        note_generali: { type: "string" }
+      }
+    },
+    domande_aperte: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["id", "domanda", "motivo", "priorita"],
+        properties: {
+          id: { type: "string" },
+          domanda: { type: "string" },
+          motivo: { type: "string" },
+          priorita: { enum: ["Alta", "Media", "Bassa"] }
+        }
+      }
+    },
+    rischi: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["id", "tipo", "descrizione", "gravita", "mitigazione"],
+        properties: {
+          id: { type: "string" },
+          tipo: { enum: ["logistico", "economico", "tempo", "spazio", "botanico", "altro"] },
+          descrizione: { type: "string" },
+          gravita: { enum: ["Alta", "Media", "Bassa"] },
+          mitigazione: { type: "string" }
+        }
+      }
+    }
+  }
+} as const;

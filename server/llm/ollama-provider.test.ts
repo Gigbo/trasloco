@@ -49,8 +49,11 @@ describe("ollama provider", () => {
 
     expect(requestBody).toMatchObject({
       model: "llama3.1:8b",
-      stream: false,
-      format: "json"
+      stream: false
+    });
+    expect(requestBody.format).toMatchObject({
+      type: "object",
+      required: expect.arrayContaining(["schema_version", "task_logistici"])
     });
     expect(requestBody.prompt).toEqual(expect.stringContaining("L'Inquisitore Logistico"));
   });

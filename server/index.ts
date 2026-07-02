@@ -1,4 +1,7 @@
+import { loadLocalEnv } from "./env";
 import { buildApp } from "./app";
+
+loadLocalEnv();
 
 const port = Number(process.env.API_PORT ?? 5174);
 const host = process.env.API_HOST ?? "127.0.0.1";

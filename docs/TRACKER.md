@@ -20,7 +20,7 @@ Legenda stato:
 | Frontend shell | DONE | UI/UX Architect | Dashboard operativa con moduli principali creata |
 | Backend locale | DONE | Full-Stack Developer | Fastify con `/api/health` e `/api/chat` mock |
 | Persistenza SQLite | DONE | Full-Stack Developer | Conversazioni, snapshot e decisioni utente granulari salvati |
-| Test parser | DONE | QA / Reliability Engineer | 18 test totali passano, inclusi parser, backend e provider Ollama |
+| Test parser | DONE | QA / Reliability Engineer | 20 test totali passano, inclusi parser, backend, env loader e provider Ollama |
 
 ## Sprint 0 - Setup E Direzione
 

@@ -213,7 +213,7 @@ Spiegazione semplice:
 - `PUT /api/botanical/interventions/:interventionId`: salva lo stato di una checklist botanica.
 - `PUT /api/botanical/notes`: salva le note libere sul layout giardino/terrazzo.
 
-Il provider attuale e `mock`: non chiama Ollama e non usa API cloud. Serve a sviluppare e testare la dashboard senza dipendere da un modello reale.
+Senza `.env`, il provider predefinito e `mock`: non chiama Ollama e non usa API cloud. Serve a sviluppare e testare la dashboard senza dipendere da un modello reale.
 
 ## Provider LLM
 
@@ -233,17 +233,19 @@ Configurazione Ollama:
 ```bash
 LLM_PROVIDER=ollama
 OLLAMA_BASE_URL=http://127.0.0.1:11434
-OLLAMA_MODEL=llama3.1:8b
+OLLAMA_MODEL=llama3.2:latest
 ```
+
+Il backend carica automaticamente il file locale `.env` se esiste. `.env` non viene salvato su Git.
 
 Prima di usare `ollama`, il servizio Ollama deve essere attivo e il modello deve essere disponibile localmente. Esempio:
 
 ```bash
-ollama pull llama3.1:8b
+ollama pull llama3.2:latest
 ollama serve
 ```
 
-Se Ollama non risponde, il backend restituisce un errore esplicito. Per tornare allo sviluppo stabile basta rimettere `LLM_PROVIDER=mock`.
+Nel Mac di sviluppo attuale e stato configurato `llama3.2:latest`, gia presente localmente. Se Ollama non risponde, il backend restituisce un errore esplicito. Per tornare allo sviluppo stabile basta rimettere `LLM_PROVIDER=mock`.
 
 ## Persistenza Locale
 
