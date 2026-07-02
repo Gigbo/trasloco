@@ -151,7 +151,7 @@ L'app non deve dipendere da un solo modello. Il backend deve usare un adattatore
 
 ## Moduli Applicativi
 
-- Console Interrogatoria: chat minimalista con tono socratico, storico conversazioni e output IA ricaricabile.
+- Console Interrogatoria: chat minimalista con tono socratico, storico conversazioni, piani validati e output IA ricaricabile.
 - Master Timeline: task ordinati per `scadenza_giorni_al_trasloco` e priorita.
 - Cruscotto Finanziario: tabella costi, totale dinamico, strategie risparmio.
 - Cimitero del Superfluo: decisioni obbligatorie su vendere, donare, buttare.
@@ -204,7 +204,8 @@ Spiegazione semplice:
 
 - `GET /api/health`: verifica che il backend sia attivo.
 - `POST /api/chat`: riceve `{ "message": "..." }` e restituisce una risposta mock con JSON LLM valido.
-- `GET /api/state`: restituisce ultimo snapshot valido, conversazioni recenti e stato utente salvato in SQLite.
+- `GET /api/state`: restituisce ultimo snapshot valido, snapshot recenti, conversazioni recenti e stato utente salvato in SQLite.
+- `GET /api/snapshots`: restituisce lo storico dei piani validati.
 - `GET /api/user-state`: restituisce solo le decisioni utente granulari.
 - `PUT /api/tasks/:taskId`: salva completamento o riapertura di un task.
 - `PUT /api/decluttering/:itemId`: salva `Vendere`, `Donare` o `Buttare`.
@@ -222,7 +223,7 @@ Salviamo:
 
 - conversazioni inviate a `/api/chat`;
 - risposte del provider LLM;
-- snapshot JSON validi dopo parsing e validazione schema.
+- snapshot JSON validi dopo parsing e validazione schema;
 - completamento e riapertura task;
 - decisioni definitive di decluttering;
 - override manuali delle stime costo;

@@ -75,6 +75,7 @@ export type Persistence = {
   saveSnapshot(input: SaveSnapshotInput): SnapshotRecord;
   getRecentConversations(limit?: number): ConversationRecord[];
   getLatestSnapshot(): SnapshotRecord | null;
+  getRecentSnapshots(limit?: number): SnapshotRecord[];
   getUserState(): UserStateRecord;
   setTaskState(taskId: string, completed: boolean): TaskStateRecord;
   setDeclutteringDecision(
@@ -205,6 +206,13 @@ export function createSqlitePersistence(dbPath = process.env.DATABASE_PATH ?? de
     LIMIT 1
   `);
 
+  const getRecentSnapshots = db.prepare(`
+    SELECT id, created_at, schema_version, snapshot_id, conversation_id, payload_json
+    FROM snapshots
+    ORDER BY id DESC
+    LIMIT ?
+  `);
+
   const upsertTaskState = db.prepare(`
     INSERT INTO task_state (task_id, completed, updated_at)
     VALUES (@task_id, @completed, @updated_at)
@@ -330,6 +338,10 @@ export function createSqlitePersistence(dbPath = process.env.DATABASE_PATH ?? de
     getLatestSnapshot() {
       const row = getLatestSnapshot.get();
       return row ? mapSnapshot(row) : null;
+    },
+
+    getRecentSnapshots(limit = 20) {
+      return getRecentSnapshots.all(limit).map(mapSnapshot);
     },
 
     getUserState() {

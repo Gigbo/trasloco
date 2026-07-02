@@ -6,26 +6,28 @@ Data: 2026-07-02
 
 Obiettivo della sessione:
 
-- riprendere il lavoro dopo la sistemazione Git/GitHub;
-- migliorare la Console Interrogatoria;
-- rendere visibile lo storico conversazioni persistito in SQLite;
-- ridurre il peso di `App.tsx` spostando la console in un componente dedicato.
+- aggiungere navigazione degli snapshot validati;
+- separare meglio piani operativi validi e conversazioni grezze;
+- esporre un endpoint dedicato per lo storico snapshot;
+- mantenere la Console Interrogatoria come centro di recupero operativo.
 
 ## Decisioni Prese
 
-- La Console Interrogatoria mostra le conversazioni recenti gia disponibili da `/api/state`.
-- Non e stato aggiunto un nuovo endpoint per lo storico: il contratto API esistente era sufficiente.
-- Selezionare una conversazione nello storico ricarica messaggio utente e output IA grezzo.
-- I tipi API condivisi vivono in `src/lib/api-types.ts`.
-- `InterrogationConsole` e ora responsabile della UI laterale, mentre `App.tsx` coordina stato e persistenza.
+- Gli snapshot sono piani validati e restano distinti dalle conversazioni.
+- `/api/state` restituisce anche `recentSnapshots` per caricare la dashboard al refresh.
+- `/api/snapshots` espone lo storico dei piani validati in modo dedicato.
+- La Console Interrogatoria mostra due liste separate: `Piani validati` e `Storico operativo`.
+- Selezionare uno snapshot ricarica il JSON validato nella dashboard.
+- Se lo snapshot e collegato a una conversazione recente, viene ricaricato anche il messaggio utente collegato.
 
 ## File Aggiornati
 
+- `server/db.ts`
+- `server/app.ts`
+- `server/app.test.ts`
 - `src/App.tsx`
 - `src/components/InterrogationConsole.tsx`
-- `src/components/DeclutteringGraveyard.tsx`
 - `src/lib/api-types.ts`
-- `server/app.test.ts`
 - `README.md`
 - `docs/TRACKER.md`
 - `docs/ROADMAP.md`
@@ -33,46 +35,47 @@ Obiettivo della sessione:
 
 ## Stato Attuale
 
-- Repository Git locale collegato a GitHub e sincronizzato.
-- Console Interrogatoria con invio mock funzionante.
-- Storico conversazioni visibile e selezionabile.
-- Output IA grezzo ricaricabile da una conversazione precedente.
-- Dashboard continua a parsare e mostrare il JSON operativo.
-- Stati utente granulari restano persistiti in SQLite.
+- Conversazioni recenti visibili e selezionabili.
+- Snapshot validati visibili e selezionabili.
+- Ultimo snapshot continua a caricarsi automaticamente al refresh.
+- Stati utente granulari restano separati dal payload IA.
+- Backend espone `/api/snapshots`.
+- La dashboard puo ricaricare piani precedenti senza leggere manualmente SQLite.
 
 ## Controllo Qualita Sessione
 
 Errori trovati:
 
-- Nessun errore TypeScript dopo lo spostamento della console.
-- La roadmap indicava ancora "storico da creare"; e stata corretta.
+- Nessun errore TypeScript dopo l'aggiunta dello storico snapshot.
+- La documentazione indicava ancora lo storico snapshot come mancante; e stata aggiornata.
 
 Miglioramenti proposti:
 
-- Aggiungere storico snapshot selezionabile, non solo ultimo snapshot.
-- Estrarre la persistenza dei moduli UI in un hook dedicato, per alleggerire ancora `App.tsx`.
-- Preparare l'adattatore Ollama reale mantenendo il provider mock come fallback.
+- Estrarre la persistenza dei moduli UI in un hook dedicato, per alleggerire `App.tsx`.
+- Preparare `LLM_PROVIDER=ollama` con fallback esplicito quando Ollama non risponde.
+- Aggiungere test e2e quando sara disponibile un browser Playwright installato.
 
 Verifiche eseguite:
 
-- `pnpm test`: 15 test passanti.
+- `pnpm test`: 16 test passanti.
 - `pnpm typecheck`: completato senza errori.
 - `pnpm build`: build Vite completata.
-- Frontend verificato su `http://127.0.0.1:5175/` perche le porte `5173/5174` erano gia occupate.
-- `/api/health` e `/api/state` verificati via HTTP.
+- Frontend verificato su `http://127.0.0.1:5175/`.
+- `/api/snapshots` verificato via HTTP.
+- `/api/state` verificato con `recentSnapshots`.
 
 ## Prossima Sessione Consigliata
 
 Obiettivo:
 
-- aggiungere navigazione degli snapshot o iniziare l'adattatore Ollama.
+- implementare l'adattatore Ollama locale.
 
 Passi consigliati:
 
-1. Esporre endpoint per lista snapshot, per esempio `GET /api/snapshots`.
-2. Mostrare snapshot precedenti nella console o in un pannello tecnico.
-3. Permettere il ripristino manuale di uno snapshot precedente.
-4. In alternativa, implementare `LLM_PROVIDER=ollama` con fallback chiaro su errore.
+1. Aggiungere provider `ollama` in `server/llm/provider.ts`.
+2. Usare `OLLAMA_BASE_URL` e `OLLAMA_MODEL` da `.env`.
+3. Gestire errore se Ollama non e avviato.
+4. Mantenere `mock` come fallback per sviluppo e test.
 
 ## Promemoria Operativo
 

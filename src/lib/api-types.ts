@@ -1,3 +1,5 @@
+import type { RelocationData } from "./relocation-schema";
+
 export type DeclutteringAction = "Vendere" | "Donare" | "Buttare";
 
 export type ConversationPayload = {
@@ -30,10 +32,18 @@ export type UserStatePayload = {
   } | null;
 };
 
+export type SnapshotPayload = {
+  id: number;
+  created_at: string;
+  schema_version: string;
+  snapshot_id: string;
+  conversation_id: number;
+  payload: RelocationData;
+};
+
 export type AppStatePayload = {
-  latestSnapshot?: {
-    payload?: unknown;
-  } | null;
+  latestSnapshot?: SnapshotPayload | null;
+  recentSnapshots?: SnapshotPayload[];
   recentConversations?: ConversationPayload[];
   userState?: UserStatePayload;
 };

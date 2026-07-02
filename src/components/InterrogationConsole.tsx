@@ -1,4 +1,4 @@
-import type { ConversationPayload } from "../lib/api-types";
+import type { ConversationPayload, SnapshotPayload } from "../lib/api-types";
 
 type InterrogationConsoleProps = {
   message: string;
@@ -7,11 +7,14 @@ type InterrogationConsoleProps = {
   isLoading: boolean;
   persistedItems: number;
   conversations: ConversationPayload[];
+  snapshots: SnapshotPayload[];
   selectedConversationId: number | null;
+  selectedSnapshotId: number | null;
   onMessageChange: (message: string) => void;
   onRawResponseChange: (rawResponse: string) => void;
   onSubmit: () => void;
   onSelectConversation: (conversation: ConversationPayload) => void;
+  onSelectSnapshot: (snapshot: SnapshotPayload) => void;
 };
 
 export function InterrogationConsole({
@@ -21,11 +24,14 @@ export function InterrogationConsole({
   isLoading,
   persistedItems,
   conversations,
+  snapshots,
   selectedConversationId,
+  selectedSnapshotId,
   onMessageChange,
   onRawResponseChange,
   onSubmit,
-  onSelectConversation
+  onSelectConversation,
+  onSelectSnapshot
 }: InterrogationConsoleProps) {
   return (
     <aside className="border-b border-neutral-800 bg-black p-5 lg:border-b-0 lg:border-r">
@@ -58,6 +64,49 @@ export function InterrogationConsole({
       <p className="mt-1 text-xs text-neutral-600">
         Conversazioni persistite: {persistedItems}
       </p>
+
+      <section className="mt-6 border border-neutral-800 bg-neutral-950">
+        <div className="flex items-center justify-between border-b border-neutral-800 p-3">
+          <p className="text-xs font-semibold uppercase text-neutral-500">
+            Piani validati
+          </p>
+          <span className="font-mono text-xs text-neutral-500">{snapshots.length}</span>
+        </div>
+
+        <div className="max-h-48 overflow-y-auto">
+          {snapshots.length > 0 ? (
+            snapshots.map((snapshot) => {
+              const isSelected = snapshot.id === selectedSnapshotId;
+
+              return (
+                <button
+                  className={`w-full border-b border-neutral-900 p-3 text-left hover:bg-neutral-900 ${
+                    isSelected ? "bg-neutral-900 text-neutral-100" : "bg-black"
+                  }`}
+                  key={snapshot.id}
+                  type="button"
+                  onClick={() => onSelectSnapshot(snapshot)}
+                >
+                  <span className="block text-xs text-neutral-500">
+                    #{snapshot.id} · {formatDate(snapshot.created_at)} ·{" "}
+                    {snapshot.schema_version}
+                  </span>
+                  <span className="mt-1 block text-sm font-semibold text-neutral-200">
+                    {snapshot.payload.fase_trasloco}
+                  </span>
+                  <span className="mt-1 line-clamp-2 block text-xs leading-5 text-neutral-500">
+                    {snapshot.payload.sintesi_operativa}
+                  </span>
+                </button>
+              );
+            })
+          ) : (
+            <p className="p-3 text-sm leading-6 text-neutral-500">
+              Nessuno snapshot validato.
+            </p>
+          )}
+        </div>
+      </section>
 
       <section className="mt-6 border border-neutral-800 bg-neutral-950">
         <div className="flex items-center justify-between border-b border-neutral-800 p-3">

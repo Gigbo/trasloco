@@ -271,10 +271,11 @@ Stato attuale:
 
 - conversazioni salvate in SQLite;
 - snapshot JSON validi salvati in SQLite;
-- `/api/state` restituisce ultimo snapshot, conversazioni recenti e stato utente;
+- `/api/state` restituisce ultimo snapshot, snapshot recenti, conversazioni recenti e stato utente;
+- `/api/snapshots` restituisce lo storico dei piani validati;
 - decisioni utente granulari persistite: task, decluttering, costi, checklist botanica e note layout;
 - ripristino automatico al refresh per ultimo snapshot e decisioni utente;
-- storico snapshot precedente non ancora navigabile da UI.
+- storico snapshot navigabile dalla Console Interrogatoria.
 
 Criteri di completamento:
 

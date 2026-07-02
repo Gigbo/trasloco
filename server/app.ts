@@ -95,8 +95,15 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
   app.get("/api/state", async () => {
     return {
       latestSnapshot: persistence.getLatestSnapshot(),
+      recentSnapshots: persistence.getRecentSnapshots(20),
       recentConversations: persistence.getRecentConversations(20),
       userState: persistence.getUserState()
+    };
+  });
+
+  app.get("/api/snapshots", async () => {
+    return {
+      snapshots: persistence.getRecentSnapshots(50)
     };
   });
 

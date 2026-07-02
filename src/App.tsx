@@ -9,7 +9,8 @@ import type { DeclutteringItem, TaskLogistico, VoceCosto } from "./lib/relocatio
 import type {
   AppStatePayload,
   ConversationPayload,
-  DeclutteringAction
+  DeclutteringAction,
+  SnapshotPayload
 } from "./lib/api-types";
 import { validRelocationResponse } from "./fixtures/demo-response";
 
@@ -21,9 +22,11 @@ export default function App() {
   const [apiStatus, setApiStatus] = useState<string>("Provider mock pronto.");
   const [persistedItems, setPersistedItems] = useState(0);
   const [conversations, setConversations] = useState<ConversationPayload[]>([]);
+  const [snapshots, setSnapshots] = useState<SnapshotPayload[]>([]);
   const [selectedConversationId, setSelectedConversationId] = useState<number | null>(
     null
   );
+  const [selectedSnapshotId, setSelectedSnapshotId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [completedTaskIds, setCompletedTaskIds] = useState<Set<string>>(new Set());
   const [declutteringDecisions, setDeclutteringDecisions] = useState<
@@ -51,16 +54,12 @@ export default function App() {
         const payload = (await response.json()) as AppStatePayload;
 
         syncConversations(payload.recentConversations ?? []);
+        syncSnapshots(payload.recentSnapshots ?? []);
         hydrateUserState(payload.userState);
 
         if (payload.latestSnapshot?.payload) {
-          setRawResponse(
-            `Snapshot persistito dal database locale.\n\n\`\`\`json\n${JSON.stringify(
-              payload.latestSnapshot.payload,
-              null,
-              2
-            )}\n\`\`\``
-          );
+          setRawResponse(formatSnapshotAsRawResponse(payload.latestSnapshot));
+          setSelectedSnapshotId(payload.latestSnapshot.id);
           setApiStatus("Ultimo snapshot valido caricato da SQLite.");
         }
       } catch {
@@ -90,6 +89,7 @@ export default function App() {
         detail?: string;
         provider?: string;
         conversationId?: number;
+        snapshotId?: number | null;
         snapshotSaved?: boolean;
       };
 
@@ -108,6 +108,24 @@ export default function App() {
       };
       syncConversations([nextConversation, ...conversations]);
       setSelectedConversationId(nextConversation.id);
+
+      const chatParseResult = parseRelocationResponse(payload.assistantText);
+
+      if (payload.snapshotSaved && payload.snapshotId && chatParseResult.success) {
+        const nextSnapshot: SnapshotPayload = {
+          id: payload.snapshotId,
+          created_at: new Date().toISOString(),
+          schema_version: chatParseResult.data.schema_version,
+          snapshot_id: chatParseResult.data.snapshot_id,
+          conversation_id: nextConversation.id,
+          payload: chatParseResult.data
+        };
+        syncSnapshots([nextSnapshot, ...snapshots]);
+        setSelectedSnapshotId(nextSnapshot.id);
+      } else {
+        setSelectedSnapshotId(null);
+      }
+
       setApiStatus(
         `Risposta ricevuta dal provider ${payload.provider ?? "sconosciuto"}. Snapshot ${
           payload.snapshotSaved ? "salvato" : "non salvato"
@@ -129,11 +147,40 @@ export default function App() {
     setPersistedItems(uniqueConversations.length);
   }
 
+  function syncSnapshots(nextSnapshots: SnapshotPayload[]) {
+    const uniqueSnapshots = Array.from(
+      new Map(nextSnapshots.map((snapshot) => [snapshot.id, snapshot])).values()
+    );
+
+    setSnapshots(uniqueSnapshots);
+  }
+
   function selectConversation(conversation: ConversationPayload) {
     setSelectedConversationId(conversation.id);
     setMessage(conversation.user_message);
     setRawResponse(conversation.assistant_text);
+    const linkedSnapshot = snapshots.find(
+      (snapshot) => snapshot.conversation_id === conversation.id
+    );
+    setSelectedSnapshotId(linkedSnapshot?.id ?? null);
     setApiStatus(`Conversazione #${conversation.id} caricata dallo storico locale.`);
+  }
+
+  function selectSnapshot(snapshot: SnapshotPayload) {
+    setSelectedSnapshotId(snapshot.id);
+    setRawResponse(formatSnapshotAsRawResponse(snapshot));
+    const linkedConversation = conversations.find(
+      (conversation) => conversation.id === snapshot.conversation_id
+    );
+
+    if (linkedConversation) {
+      setSelectedConversationId(linkedConversation.id);
+      setMessage(linkedConversation.user_message);
+    } else {
+      setSelectedConversationId(null);
+    }
+
+    setApiStatus(`Snapshot #${snapshot.id} caricato dallo storico validato.`);
   }
 
   function hydrateUserState(userState?: AppStatePayload["userState"]) {
@@ -292,11 +339,17 @@ export default function App() {
           isLoading={isLoading}
           persistedItems={persistedItems}
           conversations={conversations}
+          snapshots={snapshots}
           selectedConversationId={selectedConversationId}
+          selectedSnapshotId={selectedSnapshotId}
           onMessageChange={setMessage}
-          onRawResponseChange={setRawResponse}
+          onRawResponseChange={(nextRawResponse) => {
+            setRawResponse(nextRawResponse);
+            setSelectedSnapshotId(null);
+          }}
           onSubmit={interrogateBackend}
           onSelectConversation={selectConversation}
+          onSelectSnapshot={selectSnapshot}
         />
 
         <section className="space-y-5 p-5">
@@ -452,4 +505,12 @@ function updateSet(current: Set<string>, id: string, enabled: boolean) {
   }
 
   return next;
+}
+
+function formatSnapshotAsRawResponse(snapshot: SnapshotPayload) {
+  return `Snapshot #${snapshot.id} persistito dal database locale.\n\n\`\`\`json\n${JSON.stringify(
+    snapshot.payload,
+    null,
+    2
+  )}\n\`\`\``;
 }

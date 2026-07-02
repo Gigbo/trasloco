@@ -125,6 +125,7 @@ describe("backend API", () => {
 
     expect(stateResponse.statusCode).toBe(200);
     expect(stateResponse.json().recentConversations).toHaveLength(1);
+    expect(stateResponse.json().recentSnapshots).toHaveLength(1);
     expect(stateResponse.json().latestSnapshot.payload).toMatchObject({
       schema_version: "1.0.0",
       fase_trasloco: "Pianificazione iniziale"
@@ -135,6 +136,53 @@ describe("backend API", () => {
       costOverrides: [],
       botanicalInterventions: [],
       botanicalNotes: null
+    });
+
+    await app.close();
+  });
+
+  it("returns recent snapshots for validated plan history", async () => {
+    const app = buildTestApp(validJsonProvider);
+
+    await app.inject({
+      method: "POST",
+      url: "/api/chat",
+      payload: {
+        message: "Primo piano valido"
+      }
+    });
+    await app.inject({
+      method: "POST",
+      url: "/api/chat",
+      payload: {
+        message: "Secondo piano valido"
+      }
+    });
+
+    const stateResponse = await app.inject({
+      method: "GET",
+      url: "/api/state"
+    });
+    const snapshotsResponse = await app.inject({
+      method: "GET",
+      url: "/api/snapshots"
+    });
+
+    expect(stateResponse.statusCode).toBe(200);
+    expect(stateResponse.json().recentSnapshots).toHaveLength(2);
+    expect(stateResponse.json().recentSnapshots[0]).toMatchObject({
+      id: 2,
+      schema_version: "1.0.0",
+      snapshot_id: "snap_fixture_valid_001",
+      payload: {
+        fase_trasloco: "Pianificazione iniziale"
+      }
+    });
+    expect(snapshotsResponse.statusCode).toBe(200);
+    expect(snapshotsResponse.json().snapshots).toHaveLength(2);
+    expect(snapshotsResponse.json().snapshots[1]).toMatchObject({
+      id: 1,
+      schema_version: "1.0.0"
     });
 
     await app.close();
