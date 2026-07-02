@@ -20,7 +20,7 @@ Legenda stato:
 | Frontend shell | DONE | UI/UX Architect | Dashboard operativa con moduli principali creata |
 | Backend locale | DONE | Full-Stack Developer | Fastify con `/api/health` e `/api/chat` mock |
 | Persistenza SQLite | DONE | Full-Stack Developer | Conversazioni, snapshot e decisioni utente granulari salvati |
-| Test parser | DONE | QA / Reliability Engineer | 14 test totali passano, inclusi parser, backend e persistenza |
+| Test parser | DONE | QA / Reliability Engineer | 15 test totali passano, inclusi parser, backend e persistenza |
 
 ## Sprint 0 - Setup E Direzione
 
@@ -61,7 +61,7 @@ Legenda stato:
 | ID | Task | Stato | Priorita | Owner | Criterio di completamento |
 | --- | --- | --- | --- | --- | --- |
 | S3-001 | Creare shell dashboard | DONE | Alta | UI/UX Architect | Dashboard operativa pronta |
-| S3-002 | Creare Console Interrogatoria | DOING | Alta | Full-Stack Developer | Invio messaggi mock funzionante; storico chat da costruire |
+| S3-002 | Creare Console Interrogatoria | DONE | Alta | Full-Stack Developer | Invio mock e storico conversazioni selezionabile funzionanti |
 | S3-003 | Creare Master Timeline | DONE | Alta | Full-Stack Developer | Task ordinati, priorita visibile e conferma critici |
 | S3-004 | Creare Cruscotto Finanziario | DONE | Alta | Full-Stack Developer | Totale costi calcolato con override persistiti |
 | S3-005 | Creare Cimitero del Superfluo | DONE | Alta | Full-Stack Developer | Decisioni persistite obbligatorie in coda |
@@ -113,3 +113,4 @@ Legenda stato:
 | 2026-07-01 | Salvare conversazioni e snapshot validi in SQLite prima delle UI finali | Evita perdita dati e abilita ripristino al refresh | Full-Stack Developer |
 | 2026-07-01 | Costruire prima moduli UI con stato locale, poi persistere decisioni utente | Permette validare esperienza e flussi prima di fissare schema decisioni | UI/UX Architect |
 | 2026-07-01 | Separare snapshot IA e decisioni utente in SQLite | Una nuova risposta LLM non deve cancellare completamenti, costi corretti o decisioni gia prese | Full-Stack Developer |
+| 2026-07-02 | Rendere lo storico conversazioni visibile nella Console Interrogatoria | L'utente deve poter recuperare risposte precedenti senza aprire SQLite o leggere JSON grezzo nel database | Full-Stack Developer |

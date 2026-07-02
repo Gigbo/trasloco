@@ -1,36 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { BotanicalPlan } from "./components/BotanicalPlan";
-import {
-  DeclutteringGraveyard,
-  type DeclutteringAction
-} from "./components/DeclutteringGraveyard";
+import { DeclutteringGraveyard } from "./components/DeclutteringGraveyard";
 import { FinancialDashboard } from "./components/FinancialDashboard";
+import { InterrogationConsole } from "./components/InterrogationConsole";
 import { MasterTimeline } from "./components/MasterTimeline";
 import { parseRelocationResponse } from "./lib/parse-ai-json";
 import type { DeclutteringItem, TaskLogistico, VoceCosto } from "./lib/relocation-schema";
+import type {
+  AppStatePayload,
+  ConversationPayload,
+  DeclutteringAction
+} from "./lib/api-types";
 import { validRelocationResponse } from "./fixtures/demo-response";
-
-type UserStatePayload = {
-  taskStates: Array<{
-    task_id: string;
-    completed: boolean;
-  }>;
-  declutteringDecisions: Array<{
-    item_id: string;
-    action: DeclutteringAction;
-  }>;
-  costOverrides: Array<{
-    cost_id: string;
-    stima_eur: number;
-  }>;
-  botanicalInterventions: Array<{
-    intervention_id: string;
-    completed: boolean;
-  }>;
-  botanicalNotes: {
-    layout_notes: string;
-  } | null;
-};
 
 export default function App() {
   const [rawResponse, setRawResponse] = useState(validRelocationResponse);
@@ -39,6 +20,10 @@ export default function App() {
   );
   const [apiStatus, setApiStatus] = useState<string>("Provider mock pronto.");
   const [persistedItems, setPersistedItems] = useState(0);
+  const [conversations, setConversations] = useState<ConversationPayload[]>([]);
+  const [selectedConversationId, setSelectedConversationId] = useState<number | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [completedTaskIds, setCompletedTaskIds] = useState<Set<string>>(new Set());
   const [declutteringDecisions, setDeclutteringDecisions] = useState<
@@ -63,15 +48,9 @@ export default function App() {
           return;
         }
 
-        const payload = (await response.json()) as {
-          latestSnapshot?: {
-            payload?: unknown;
-          } | null;
-          recentConversations?: unknown[];
-          userState?: UserStatePayload;
-        };
+        const payload = (await response.json()) as AppStatePayload;
 
-        setPersistedItems(payload.recentConversations?.length ?? 0);
+        syncConversations(payload.recentConversations ?? []);
         hydrateUserState(payload.userState);
 
         if (payload.latestSnapshot?.payload) {
@@ -110,6 +89,7 @@ export default function App() {
         error?: string;
         detail?: string;
         provider?: string;
+        conversationId?: number;
         snapshotSaved?: boolean;
       };
 
@@ -118,7 +98,16 @@ export default function App() {
       }
 
       setRawResponse(payload.assistantText);
-      setPersistedItems((current) => current + 1);
+      const submittedMessage = message;
+      const nextConversation: ConversationPayload = {
+        id: payload.conversationId ?? Date.now(),
+        created_at: new Date().toISOString(),
+        user_message: submittedMessage,
+        assistant_text: payload.assistantText,
+        provider: payload.provider ?? "sconosciuto"
+      };
+      syncConversations([nextConversation, ...conversations]);
+      setSelectedConversationId(nextConversation.id);
       setApiStatus(
         `Risposta ricevuta dal provider ${payload.provider ?? "sconosciuto"}. Snapshot ${
           payload.snapshotSaved ? "salvato" : "non salvato"
@@ -131,7 +120,23 @@ export default function App() {
     }
   }
 
-  function hydrateUserState(userState?: UserStatePayload) {
+  function syncConversations(nextConversations: ConversationPayload[]) {
+    const uniqueConversations = Array.from(
+      new Map(nextConversations.map((conversation) => [conversation.id, conversation])).values()
+    );
+
+    setConversations(uniqueConversations);
+    setPersistedItems(uniqueConversations.length);
+  }
+
+  function selectConversation(conversation: ConversationPayload) {
+    setSelectedConversationId(conversation.id);
+    setMessage(conversation.user_message);
+    setRawResponse(conversation.assistant_text);
+    setApiStatus(`Conversazione #${conversation.id} caricata dallo storico locale.`);
+  }
+
+  function hydrateUserState(userState?: AppStatePayload["userState"]) {
     if (!userState) {
       return;
     }
@@ -280,49 +285,19 @@ export default function App() {
   return (
     <main className="min-h-screen bg-neutral-950 text-neutral-100">
       <section className="grid min-h-screen grid-cols-1 lg:grid-cols-[420px_minmax(0,1fr)]">
-        <aside className="border-b border-neutral-800 bg-black p-5 lg:border-b-0 lg:border-r">
-          <p className="text-xs font-semibold uppercase tracking-widest text-red-500">
-            L'Inquisitore Logistico
-          </p>
-          <h1 className="mt-3 text-2xl font-semibold">
-            Relocation Manager
-          </h1>
-          <p className="mt-3 text-sm leading-6 text-neutral-400">
-            Console tecnica. Interroga il backend mock, valida il JSON e trasforma
-            il modulo IA in dashboard operativa.
-          </p>
-
-          <label className="mt-6 block text-xs font-semibold uppercase tracking-widest text-neutral-500">
-            Console interrogatoria
-          </label>
-          <textarea
-            className="mt-2 h-28 w-full resize-none border border-neutral-800 bg-neutral-950 p-3 text-sm leading-5 text-neutral-200 outline-none focus:border-red-500"
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
-          />
-          <button
-            className="mt-3 w-full border border-red-800 bg-red-950 px-4 py-3 text-sm font-semibold uppercase tracking-widest text-red-100 hover:bg-red-900 disabled:cursor-not-allowed disabled:border-neutral-800 disabled:bg-neutral-900 disabled:text-neutral-500"
-            type="button"
-            onClick={interrogateBackend}
-            disabled={isLoading}
-          >
-            {isLoading ? "Interrogazione..." : "Interroga"}
-          </button>
-          <p className="mt-3 min-h-5 text-xs text-neutral-500">{apiStatus}</p>
-          <p className="mt-1 text-xs text-neutral-600">
-            Conversazioni persistite: {persistedItems}
-          </p>
-
-          <label className="mt-6 block text-xs font-semibold uppercase tracking-widest text-neutral-500">
-            Output IA grezzo
-          </label>
-          <textarea
-            className="mt-2 h-[460px] w-full resize-none border border-neutral-800 bg-neutral-950 p-3 font-mono text-xs leading-5 text-neutral-200 outline-none focus:border-red-500"
-            value={rawResponse}
-            onChange={(event) => setRawResponse(event.target.value)}
-            spellCheck={false}
-          />
-        </aside>
+        <InterrogationConsole
+          message={message}
+          rawResponse={rawResponse}
+          apiStatus={apiStatus}
+          isLoading={isLoading}
+          persistedItems={persistedItems}
+          conversations={conversations}
+          selectedConversationId={selectedConversationId}
+          onMessageChange={setMessage}
+          onRawResponseChange={setRawResponse}
+          onSubmit={interrogateBackend}
+          onSelectConversation={selectConversation}
+        />
 
         <section className="space-y-5 p-5">
           {parseResult.success ? (

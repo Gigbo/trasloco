@@ -140,6 +140,43 @@ describe("backend API", () => {
     await app.close();
   });
 
+  it("returns recent conversations for the console history", async () => {
+    const app = buildTestApp();
+
+    await app.inject({
+      method: "POST",
+      url: "/api/chat",
+      payload: {
+        message: "Prima richiesta"
+      }
+    });
+    await app.inject({
+      method: "POST",
+      url: "/api/chat",
+      payload: {
+        message: "Seconda richiesta"
+      }
+    });
+
+    const stateResponse = await app.inject({
+      method: "GET",
+      url: "/api/state"
+    });
+
+    expect(stateResponse.statusCode).toBe(200);
+    expect(stateResponse.json().recentConversations).toHaveLength(2);
+    expect(stateResponse.json().recentConversations[0]).toMatchObject({
+      user_message: "Seconda richiesta",
+      assistant_text: "Mock response for: Seconda richiesta",
+      provider: "mock"
+    });
+    expect(stateResponse.json().recentConversations[1]).toMatchObject({
+      user_message: "Prima richiesta"
+    });
+
+    await app.close();
+  });
+
   it("persists user task state", async () => {
     const app = buildTestApp();
 

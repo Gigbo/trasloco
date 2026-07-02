@@ -2,33 +2,30 @@
 
 ## Ultima Sessione
 
-Data: 2026-07-01
+Data: 2026-07-02
 
 Obiettivo della sessione:
 
-- persistere le decisioni utente dei moduli UI;
-- separare lo snapshot generato dall'IA dalle azioni prese nella dashboard;
-- aggiungere API locali per completamenti, costi, decluttering e botanica;
-- verificare che refresh e riavvio non perdano lo stato operativo.
+- riprendere il lavoro dopo la sistemazione Git/GitHub;
+- migliorare la Console Interrogatoria;
+- rendere visibile lo storico conversazioni persistito in SQLite;
+- ridurre il peso di `App.tsx` spostando la console in un componente dedicato.
 
 ## Decisioni Prese
 
-- Lo snapshot IA resta una fotografia del piano generato dal modello.
-- Le decisioni utente sono salvate in tabelle SQLite separate.
-- `App.tsx` e il punto unico di coordinamento dello stato UI persistito.
-- I moduli UI sono componenti controllati: ricevono stato e callback, non salvano piu decisioni solo in memoria.
-- Le note botaniche vengono salvate al blur del campo testo per evitare una chiamata API a ogni carattere.
+- La Console Interrogatoria mostra le conversazioni recenti gia disponibili da `/api/state`.
+- Non e stato aggiunto un nuovo endpoint per lo storico: il contratto API esistente era sufficiente.
+- Selezionare una conversazione nello storico ricarica messaggio utente e output IA grezzo.
+- I tipi API condivisi vivono in `src/lib/api-types.ts`.
+- `InterrogationConsole` e ora responsabile della UI laterale, mentre `App.tsx` coordina stato e persistenza.
 
 ## File Aggiornati
 
-- `server/db.ts`
-- `server/app.ts`
-- `server/app.test.ts`
 - `src/App.tsx`
-- `src/components/MasterTimeline.tsx`
-- `src/components/FinancialDashboard.tsx`
+- `src/components/InterrogationConsole.tsx`
 - `src/components/DeclutteringGraveyard.tsx`
-- `src/components/BotanicalPlan.tsx`
+- `src/lib/api-types.ts`
+- `server/app.test.ts`
 - `README.md`
 - `docs/TRACKER.md`
 - `docs/ROADMAP.md`
@@ -36,44 +33,46 @@ Obiettivo della sessione:
 
 ## Stato Attuale
 
-- Conversazioni e snapshot validi sono persistiti in SQLite.
-- `/api/state` restituisce snapshot, conversazioni recenti e stato utente.
-- `/api/user-state` restituisce solo le decisioni granulari.
-- Master Timeline salva completamento e riapertura task.
-- Cruscotto Finanziario salva override manuali delle stime.
-- Cimitero del Superfluo salva decisioni `Vendere`, `Donare`, `Buttare`.
-- Planimetria Botanica salva checklist interventi e note layout.
+- Repository Git locale collegato a GitHub e sincronizzato.
+- Console Interrogatoria con invio mock funzionante.
+- Storico conversazioni visibile e selezionabile.
+- Output IA grezzo ricaricabile da una conversazione precedente.
+- Dashboard continua a parsare e mostrare il JSON operativo.
+- Stati utente granulari restano persistiti in SQLite.
 
 ## Controllo Qualita Sessione
 
 Errori trovati:
 
-- Nessun errore TypeScript o test fallito dopo l'integrazione.
-- La verifica browser headless resta non completata per assenza del browser Chromium nel runtime locale.
+- Nessun errore TypeScript dopo lo spostamento della console.
+- La roadmap indicava ancora "storico da creare"; e stata corretta.
 
 Miglioramenti proposti:
 
-- Spezzare `App.tsx` in hook dedicati, per esempio `useUserStatePersistence`, prima che cresca ancora.
-- Aggiungere storico conversazioni nella Console Interrogatoria.
-- Aggiungere test e2e quando sara disponibile un browser Playwright installato.
+- Aggiungere storico snapshot selezionabile, non solo ultimo snapshot.
+- Estrarre la persistenza dei moduli UI in un hook dedicato, per alleggerire ancora `App.tsx`.
+- Preparare l'adattatore Ollama reale mantenendo il provider mock come fallback.
 
 Verifiche eseguite:
 
-- `pnpm test`: 14 test passanti.
+- `pnpm test`: 15 test passanti.
 - `pnpm typecheck`: completato senza errori.
+- `pnpm build`: build Vite completata.
+- Frontend verificato su `http://127.0.0.1:5175/` perche le porte `5173/5174` erano gia occupate.
+- `/api/health` e `/api/state` verificati via HTTP.
 
 ## Prossima Sessione Consigliata
 
 Obiettivo:
 
-- migliorare la Console Interrogatoria e lo storico operativo.
+- aggiungere navigazione degli snapshot o iniziare l'adattatore Ollama.
 
 Passi consigliati:
 
-1. Mostrare le conversazioni recenti nella console laterale.
-2. Separare `App.tsx` in hook o componenti piu piccoli.
-3. Aggiungere filtro o selezione snapshot quando esistono piu piani.
-4. Preparare l'adattatore Ollama reale mantenendo il provider mock come fallback.
+1. Esporre endpoint per lista snapshot, per esempio `GET /api/snapshots`.
+2. Mostrare snapshot precedenti nella console o in un pannello tecnico.
+3. Permettere il ripristino manuale di uno snapshot precedente.
+4. In alternativa, implementare `LLM_PROVIDER=ollama` con fallback chiaro su errore.
 
 ## Promemoria Operativo
 

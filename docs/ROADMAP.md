@@ -120,7 +120,8 @@ Stato attuale:
 
 - invio messaggi mock funzionante;
 - risposta IA mock con JSON operativo;
-- storico conversazione persistente ancora da creare.
+- storico conversazioni persistente visibile nella console;
+- selezione conversazione precedente con ricaricamento dell'output IA grezzo.
 
 ## Fase 4 - Master Timeline
 

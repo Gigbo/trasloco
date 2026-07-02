@@ -1,7 +1,6 @@
 import { useMemo } from "react";
+import type { DeclutteringAction } from "../lib/api-types";
 import type { DeclutteringItem } from "../lib/relocation-schema";
-
-export type DeclutteringAction = "Vendere" | "Donare" | "Buttare";
 
 type DeclutteringGraveyardProps = {
   items: DeclutteringItem[];

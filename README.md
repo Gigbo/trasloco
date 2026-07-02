@@ -151,7 +151,7 @@ L'app non deve dipendere da un solo modello. Il backend deve usare un adattatore
 
 ## Moduli Applicativi
 
-- Console Interrogatoria: chat minimalista con tono socratico e operativo.
+- Console Interrogatoria: chat minimalista con tono socratico, storico conversazioni e output IA ricaricabile.
 - Master Timeline: task ordinati per `scadenza_giorni_al_trasloco` e priorita.
 - Cruscotto Finanziario: tabella costi, totale dinamico, strategie risparmio.
 - Cimitero del Superfluo: decisioni obbligatorie su vendere, donare, buttare.
