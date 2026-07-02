@@ -178,7 +178,7 @@ Comandi:
 
 ```bash
 pnpm install
-pnpm dev
+pnpm start:local
 ```
 
 Indirizzi locali:
@@ -200,6 +200,7 @@ Spiegazione semplice:
 
 - `pnpm install` prepara gli strumenti del progetto;
 - `pnpm check:local` controlla strumenti, dipendenze e Ollama;
+- `pnpm start:local` esegue il controllo e poi avvia l'app;
 - `pnpm dev` accende frontend e backend in locale;
 - `pnpm test` controlla che parser e schema respingano output LLM sbagliati;
 - `pnpm build` verifica che l'app possa essere impacchettata.

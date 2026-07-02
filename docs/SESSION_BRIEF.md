@@ -6,23 +6,24 @@ Data: 2026-07-02
 
 Obiettivo della sessione:
 
-- preparare un avvio locale semplice fuori da Codex;
-- aggiungere una checklist automatica per strumenti e Ollama;
-- documentare cosa fare quando porte, Node, pnpm o modelli non sono pronti.
+- rendere l'avvio locale ancora piu semplice;
+- aggiungere un comando unico che controlla il Mac e poi avvia l'app;
+- mantenere disponibili i comandi separati per sviluppo tecnico.
 
 ## Decisioni Prese
 
-- Aggiunto `pnpm check:local` come controllo pre-avvio.
-- Il check distingue problemi bloccanti da avvisi.
-- `.env` e Ollama possono generare avvisi senza bloccare: il provider `mock` resta utilizzabile.
-- La guida pratica vive in `docs/RUN_LOCAL.md`.
+- Aggiunto `pnpm start:local` come comando consigliato per uso quotidiano.
+- `start:local` esegue il check pre-volo in modalita JSON.
+- Se mancano requisiti obbligatori, l'avvio si ferma.
+- Se ci sono solo avvisi, l'app parte comunque.
+- `pnpm dev` resta il comando diretto per sviluppo tecnico.
 
 ## File Aggiornati
 
 - `scripts/check-local.mjs`
+- `scripts/start-local.mjs`
 - `package.json`
 - `docs/RUN_LOCAL.md`
-- `docs/INSTALLATION_AUDIT.md`
 - `README.md`
 - `docs/ROADMAP.md`
 - `docs/TRACKER.md`
@@ -30,41 +31,30 @@ Obiettivo della sessione:
 
 ## Stato Attuale
 
-- `pnpm check:local` controlla:
-  - Node.js;
-  - pnpm;
-  - `node_modules`;
-  - `.env`;
-  - Ollama CLI;
-  - modelli Ollama;
-  - `gemma4:latest`.
-- Nel sandbox Codex il check puo mostrare avvisi su Ollama.
-- Con permesso locale, il check vede correttamente Ollama.
-- Modelli rilevati sul Mac:
-  - `gemma4:latest`;
-  - `llama3.2:latest`.
-- La guida `docs/RUN_LOCAL.md` spiega come avviare, verificare e spegnere l'app.
+- `pnpm check:local` controlla ambiente e Ollama.
+- `pnpm start:local` esegue check e poi avvia backend/frontend.
+- Lo script mostra istruzioni chiare: aprire l'URL indicato da Vite e spegnere con `Ctrl + C`.
+- Comando testato: parte correttamente e mostra `http://127.0.0.1:5175/` quando le porte standard sono occupate.
+- Il dev server di prova e stato spento a fine sessione.
 
 ## Controllo Qualita Sessione
 
 Errori o lacune trovate:
 
-- Non c'era una guida rapida per avviare l'app senza Codex.
-- Non c'era un comando unico per capire se il Mac era pronto.
-- La prima versione del check trattava gli avvisi Ollama come errore bloccante.
+- La guida aveva `pnpm check:local` e `pnpm dev`, ma mancava un comando unico.
+- `check:local` non aveva una modalita macchina per essere riusato da altri script.
 
 Correzioni applicate:
 
-- Aggiunto script `scripts/check-local.mjs`.
-- Aggiunto script npm `check:local`.
-- Aggiunto `docs/RUN_LOCAL.md`.
-- Aggiornato audit installazioni con `llama3.2:latest`.
-- Il check ora fallisce solo su problemi obbligatori, come `pnpm` o `node_modules` mancanti.
+- Aggiunto `scripts/start-local.mjs`.
+- Aggiunta modalita `--json` a `scripts/check-local.mjs`.
+- Aggiornati README e guida `docs/RUN_LOCAL.md`.
+- Aggiornati roadmap e tracker.
 
 Verifiche eseguite:
 
-- `pnpm check:local`: completato con avvisi nel sandbox.
-- `pnpm check:local` con permesso locale: completato senza errori.
+- `pnpm start:local`: avvio riuscito, poi spento con `Ctrl + C`.
+- `pnpm check:local`: completato senza errori con permesso locale.
 - `pnpm test`: 27 test passanti.
 - `pnpm typecheck`: completato senza errori.
 - `pnpm build`: completato senza errori.
@@ -74,13 +64,14 @@ Verifiche eseguite:
 
 Obiettivo:
 
-- preparare packaging/avvio ancora piu semplice.
+- verificare manualmente il cambio modello tra `gemma4:latest` e `llama3.2:latest` dalla UI, oppure passare a packaging/test browser.
 
 Passi consigliati:
 
-1. Valutare uno script `start:local` con controlli e avvio guidato.
-2. Valutare se aggiungere Playwright solo se vogliamo test browser reale.
-3. Verificare manualmente il cambio modello tra `gemma4:latest` e `llama3.2:latest` dalla UI.
+1. Avviare con `pnpm start:local`.
+2. Aprire l'URL mostrato da Vite.
+3. Cambiare modello nella Console Interrogatoria.
+4. Inviare una richiesta breve e verificare che la risposta indichi il modello scelto.
 
 ## Promemoria Operativo
 

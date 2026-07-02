@@ -8,6 +8,7 @@
     "dev:web": "vite --host 127.0.0.1",
     "dev:api": "tsx watch server/index.ts",
     "start:api": "tsx server/index.ts",
+    "start:local": "node scripts/start-local.mjs",
     "check:local": "node scripts/check-local.mjs",
     "build": "tsc -b && vite build",
     "test": "vitest run",

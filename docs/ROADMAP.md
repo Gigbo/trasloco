@@ -329,6 +329,7 @@ Criteri di completamento:
 16. Diagnostica Ollama in UI. DONE
 17. Selezione modello Ollama da UI. DONE
 18. Guida avvio locale e check pre-volo. DONE
-19. Eventuale test browser con Playwright.
-20. Eventuale API cloud.
-21. Test e packaging.
+19. Comando `start:local`. DONE
+20. Eventuale test browser con Playwright.
+21. Eventuale API cloud.
+22. Test e packaging.

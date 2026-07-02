@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 
 const checks = [];
+const isJsonMode = process.argv.includes("--json");
 
 function addCheck(label, ok, detail, fix, required = false) {
   checks.push({
@@ -94,27 +95,44 @@ if (ollamaVersion) {
 const failedChecks = checks.filter((check) => !check.ok);
 const blockingChecks = failedChecks.filter((check) => check.required);
 
-console.log("\nRelocation Manager - controllo locale\n");
+if (!isJsonMode) {
+  console.log("\nRelocation Manager - controllo locale\n");
+}
 
-for (const check of checks) {
-  const marker = check.ok ? "OK" : "ATTENZIONE";
-  console.log(`[${marker}] ${check.label}: ${check.detail}`);
+if (isJsonMode) {
+  console.log(
+    JSON.stringify(
+      {
+        ok: blockingChecks.length === 0,
+        hasWarnings: failedChecks.length > 0,
+        checks
+      },
+      null,
+      2
+    )
+  );
+} else {
+  for (const check of checks) {
+    const marker = check.ok ? "OK" : "ATTENZIONE";
+    console.log(`[${marker}] ${check.label}: ${check.detail}`);
 
-  if (!check.ok && check.fix) {
-    console.log(`       Come risolvere: ${check.fix}`);
+    if (!check.ok && check.fix) {
+      console.log(`       Come risolvere: ${check.fix}`);
+    }
+  }
+
+  if (blockingChecks.length > 0) {
+    console.log("\nControllo fallito. Correggi i punti obbligatori e riprova.");
+  } else if (failedChecks.length > 0) {
+    console.log(
+      "\nControllo completato con avvisi. Puoi avviare l'app, ma correggi gli avvisi per usare tutte le funzioni."
+    );
+  } else {
+    console.log("\nTutto pronto. Puoi avviare l'app con: pnpm dev");
   }
 }
 
-if (blockingChecks.length > 0) {
-  console.log("\nControllo fallito. Correggi i punti obbligatori e riprova.");
-  process.exitCode = 1;
-} else if (failedChecks.length > 0) {
-  console.log(
-    "\nControllo completato con avvisi. Puoi avviare l'app, ma correggi gli avvisi per usare tutte le funzioni."
-  );
-} else {
-  console.log("\nTutto pronto. Puoi avviare l'app con: pnpm dev");
-}
+process.exitCode = blockingChecks.length > 0 ? 1 : 0;
 
 function firstUsefulLine(value) {
   return value.split("\n").slice(0, 2).join(" | ");

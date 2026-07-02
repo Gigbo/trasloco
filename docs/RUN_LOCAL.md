@@ -7,7 +7,7 @@ Metafora semplice: l'app ha due motori.
 - Frontend: la finestra che vedi nel browser.
 - Backend: il banco operativo che parla con SQLite e Ollama.
 
-`pnpm dev` accende entrambi.
+`pnpm start:local` controlla il Mac e poi accende entrambi.
 
 ## 1. Apri La Cartella Giusta
 
@@ -103,6 +103,16 @@ ollama pull llama3.2:latest
 Sul Mac di sviluppo attuale sono gia presenti `gemma4:latest` e `llama3.2:latest`.
 
 ## 6. Avvia L'App
+
+Comando consigliato:
+
+```bash
+pnpm start:local
+```
+
+Fa prima il controllo pre-avvio e poi lancia l'app.
+
+Comando diretto, se sai gia che tutto e pronto:
 
 ```bash
 pnpm dev
