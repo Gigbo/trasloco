@@ -10,6 +10,7 @@ const initialProviderStatus: ProviderStatusPayload = {
 export function useProviderStatus() {
   const [providerStatus, setProviderStatus] =
     useState<ProviderStatusPayload>(initialProviderStatus);
+  const [isChangingModel, setIsChangingModel] = useState(false);
 
   const refreshProviderStatus = useCallback(async () => {
     try {
@@ -47,8 +48,40 @@ export function useProviderStatus() {
     void refreshProviderStatus();
   }, [refreshProviderStatus]);
 
+  const changeProviderModel = useCallback(
+    async (model: string) => {
+      setIsChangingModel(true);
+
+      try {
+        const response = await fetch("/api/llm/model", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ model })
+        });
+
+        const payload = (await response.json().catch(() => null)) as {
+          detail?: string;
+          error?: string;
+        } | null;
+
+        if (!response.ok) {
+          throw new Error(payload?.detail ?? payload?.error ?? "Cambio modello fallito.");
+        }
+
+        await refreshProviderStatus();
+      } finally {
+        setIsChangingModel(false);
+      }
+    },
+    [refreshProviderStatus]
+  );
+
   return {
     providerStatus,
-    refreshProviderStatus
+    isChangingModel,
+    refreshProviderStatus,
+    changeProviderModel
   };
 }

@@ -20,7 +20,7 @@ Legenda stato:
 | Frontend shell | DONE | UI/UX Architect | Dashboard operativa con moduli principali creata |
 | Backend locale | DONE | Full-Stack Developer | Fastify con `/api/health` e `/api/chat` mock |
 | Persistenza SQLite | DONE | Full-Stack Developer | Conversazioni, snapshot e decisioni utente granulari salvati |
-| Test parser | DONE | QA / Reliability Engineer | 25 test totali passano, inclusi parser, backend, env loader, provider Ollama, fallback provider, diagnostica Ollama ed e2e dati dashboard |
+| Test parser | DONE | QA / Reliability Engineer | 27 test totali passano, inclusi parser, backend, env loader, provider Ollama, fallback provider, diagnostica Ollama, cambio modello ed e2e dati dashboard |
 
 ## Sprint 0 - Setup E Direzione
 
@@ -89,6 +89,7 @@ Legenda stato:
 | S5-006 | Estrarre hook da `App.tsx` | DONE | Media | Full-Stack Developer | Provider status e persistenza UI separati in hook dedicati |
 | S5-007 | Controllare installazioni mancanti | DONE | Media | Full-Stack Developer | Audit scritto in `docs/INSTALLATION_AUDIT.md` |
 | S5-008 | Mostrare diagnostica Ollama in UI | DONE | Media | LLM Integration Engineer | Console mostra stato modello, endpoint e modelli installati |
+| S5-009 | Permettere cambio modello Ollama da UI | DONE | Media | LLM Integration Engineer | Select usa solo modelli installati e salva scelta in SQLite |
 
 ## Rischi Aperti
 
@@ -128,3 +129,4 @@ Legenda stato:
 | 2026-07-02 | Non installare Playwright o jsdom finche non servono davvero | Il progetto e stabile con Vitest; tooling browser e component test si aggiungono quando c'e un caso concreto | QA / Reliability Engineer |
 | 2026-07-02 | Aggiungere focus visibile globale e label ai controlli | Tastiera e screen reader devono poter usare i controlli principali senza ambiguita | UI/UX Architect |
 | 2026-07-02 | Aggiungere diagnostica Ollama a `/api/health` | La UI deve distinguere backend attivo, Ollama raggiungibile e modello configurato davvero installato | LLM Integration Engineer |
+| 2026-07-02 | Salvare il modello Ollama selezionato in SQLite | La scelta utente deve sopravvivere al riavvio senza modificare automaticamente `.env` | LLM Integration Engineer |

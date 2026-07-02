@@ -9,6 +9,7 @@ type InterrogationConsoleProps = {
   rawResponse: string;
   apiStatus: string;
   providerStatus: ProviderStatusPayload;
+  isChangingModel: boolean;
   isLoading: boolean;
   persistedItems: number;
   conversations: ConversationPayload[];
@@ -18,6 +19,7 @@ type InterrogationConsoleProps = {
   onMessageChange: (message: string) => void;
   onRawResponseChange: (rawResponse: string) => void;
   onSubmit: () => void;
+  onModelChange: (model: string) => Promise<void>;
   onSelectConversation: (conversation: ConversationPayload) => void;
   onSelectSnapshot: (snapshot: SnapshotPayload) => void;
 };
@@ -27,6 +29,7 @@ export function InterrogationConsole({
   rawResponse,
   apiStatus,
   providerStatus,
+  isChangingModel,
   isLoading,
   persistedItems,
   conversations,
@@ -36,6 +39,7 @@ export function InterrogationConsole({
   onMessageChange,
   onRawResponseChange,
   onSubmit,
+  onModelChange,
   onSelectConversation,
   onSelectSnapshot
 }: InterrogationConsoleProps) {
@@ -100,9 +104,37 @@ export function InterrogationConsole({
             ) : null}
             {providerStatus.llm.installedModels.length > 0 ? (
               <div className="mt-3">
-                <p className="text-xs uppercase text-neutral-600">
+                <label
+                  className="text-xs uppercase text-neutral-600"
+                  htmlFor="ollama-model-select"
+                >
                   Modelli installati: {providerStatus.llm.installedModels.length}
-                </p>
+                </label>
+                <select
+                  className="mt-2 w-full border border-neutral-800 bg-black px-2 py-2 font-mono text-xs text-neutral-200 outline-none focus:border-red-500 disabled:cursor-not-allowed disabled:text-neutral-600"
+                  disabled={isChangingModel || providerStatus.llm.installedModels.length < 2}
+                  id="ollama-model-select"
+                  value={providerStatus.model ?? ""}
+                  onChange={(event) => {
+                    void onModelChange(event.target.value);
+                  }}
+                >
+                  {providerStatus.llm.installedModels.map((model) => (
+                    <option key={model} value={model}>
+                      {model}
+                    </option>
+                  ))}
+                </select>
+                {providerStatus.llm.installedModels.length < 2 ? (
+                  <p className="mt-2 text-xs leading-5 text-neutral-500">
+                    Installa un altro modello Ollama per abilitarne il cambio.
+                  </p>
+                ) : null}
+                {isChangingModel ? (
+                  <p className="mt-2 text-xs leading-5 text-neutral-400">
+                    Cambio modello in corso...
+                  </p>
+                ) : null}
                 <div className="mt-2 flex flex-wrap gap-2">
                   {providerStatus.llm.installedModels.slice(0, 4).map((model) => (
                     <span

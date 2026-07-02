@@ -17,11 +17,16 @@ const defaultModel = "llama3.1:8b";
 
 export function createOllamaProvider(): LlmProvider {
   const baseUrl = normalizeBaseUrl(process.env.OLLAMA_BASE_URL ?? defaultBaseUrl);
-  const model = process.env.OLLAMA_MODEL ?? defaultModel;
+  let selectedModel = process.env.OLLAMA_MODEL ?? defaultModel;
 
   return {
     name: "ollama",
-    model,
+    get model() {
+      return selectedModel;
+    },
+    setModel(model: string) {
+      selectedModel = model;
+    },
     async diagnostics() {
       const response = await fetch(`${baseUrl}/api/tags`, {
         method: "GET"
@@ -55,7 +60,7 @@ export function createOllamaProvider(): LlmProvider {
         .map((item) => item.name ?? item.model)
         .filter((item): item is string => Boolean(item))
         .sort((left, right) => left.localeCompare(right));
-      const selectedModelInstalled = installedModels.includes(model);
+      const selectedModelInstalled = installedModels.includes(selectedModel);
 
       return {
         status: selectedModelInstalled ? "ready" : "missing_model",
@@ -63,8 +68,8 @@ export function createOllamaProvider(): LlmProvider {
         installedModels,
         selectedModelInstalled,
         detail: selectedModelInstalled
-          ? `Modello "${model}" disponibile in Ollama.`
-          : `Modello configurato "${model}" non trovato in Ollama.`
+          ? `Modello "${selectedModel}" disponibile in Ollama.`
+          : `Modello configurato "${selectedModel}" non trovato in Ollama.`
       };
     },
     async chat(request: ChatRequest): Promise<ChatResponse> {
@@ -74,7 +79,7 @@ export function createOllamaProvider(): LlmProvider {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model,
+          model: selectedModel,
           prompt: buildRelocationPrompt(request.message),
           stream: false,
           format: relocationJsonSchema,
@@ -95,7 +100,7 @@ export function createOllamaProvider(): LlmProvider {
       if (!response.ok) {
         throw new Error(
           payload?.error ??
-            `Ollama ha risposto con HTTP ${response.status}. Verifica che il modello "${model}" sia installato.`
+            `Ollama ha risposto con HTTP ${response.status}. Verifica che il modello "${selectedModel}" sia installato.`
         );
       }
 
@@ -106,7 +111,7 @@ export function createOllamaProvider(): LlmProvider {
       return {
         provider: "ollama",
         assistantText: [
-          `Provider Ollama locale: ${model}.`,
+          `Provider Ollama locale: ${selectedModel}.`,
           "Risposta JSON generata dal modello locale.",
           "```json",
           payload.response,

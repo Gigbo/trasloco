@@ -98,6 +98,96 @@ describe("backend API", () => {
     await app.close();
   });
 
+  it("changes and persists the selected LLM model when installed", async () => {
+    let selectedModel = "gemma4:latest";
+    const persistence = createSqlitePersistence(":memory:");
+    const switchableProvider: LlmProvider = {
+      name: "ollama",
+      get model() {
+        return selectedModel;
+      },
+      async diagnostics() {
+        return {
+          status: "ready",
+          baseUrl: "http://127.0.0.1:11434",
+          installedModels: ["gemma4:latest", "llama3.2:latest"],
+          selectedModelInstalled: true
+        };
+      },
+      setModel(model) {
+        selectedModel = model;
+      },
+      async chat() {
+        return {
+          provider: "ollama",
+          assistantText: "ok"
+        };
+      }
+    };
+    const app = buildApp({
+      llmProvider: switchableProvider,
+      persistence
+    });
+
+    const response = await app.inject({
+      method: "PUT",
+      url: "/api/llm/model",
+      payload: {
+        model: "llama3.2:latest"
+      }
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      provider: "ollama",
+      model: "llama3.2:latest"
+    });
+    expect(persistence.getAppSetting("selected_llm_model")).toMatchObject({
+      value: "llama3.2:latest"
+    });
+
+    await app.close();
+  });
+
+  it("rejects LLM model changes when the model is not installed", async () => {
+    const switchableProvider: LlmProvider = {
+      name: "ollama",
+      model: "gemma4:latest",
+      async diagnostics() {
+        return {
+          status: "ready",
+          installedModels: ["gemma4:latest"],
+          selectedModelInstalled: true
+        };
+      },
+      setModel() {
+        throw new Error("setModel should not run for missing models");
+      },
+      async chat() {
+        return {
+          provider: "ollama",
+          assistantText: "ok"
+        };
+      }
+    };
+    const app = buildTestApp(switchableProvider);
+
+    const response = await app.inject({
+      method: "PUT",
+      url: "/api/llm/model",
+      payload: {
+        model: "missing:latest"
+      }
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toMatchObject({
+      error: "Modello non installato."
+    });
+
+    await app.close();
+  });
+
   it("returns a clear 502 when the LLM provider fails", async () => {
     const failingProvider: LlmProvider = {
       name: "ollama",

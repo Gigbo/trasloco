@@ -62,6 +62,12 @@ export type BotanicalNotesRecord = {
   updated_at: string;
 };
 
+export type AppSettingRecord = {
+  key: string;
+  value: string;
+  updated_at: string;
+};
+
 export type UserStateRecord = {
   taskStates: TaskStateRecord[];
   declutteringDecisions: DeclutteringDecisionRecord[];
@@ -88,6 +94,8 @@ export type Persistence = {
     completed: boolean
   ): BotanicalInterventionStateRecord;
   setBotanicalNotes(layoutNotes: string): BotanicalNotesRecord;
+  getAppSetting(key: string): AppSettingRecord | null;
+  setAppSetting(key: string, value: string): AppSettingRecord;
   close(): void;
 };
 
@@ -154,6 +162,12 @@ export function createSqlitePersistence(dbPath = process.env.DATABASE_PATH ?? de
     CREATE TABLE IF NOT EXISTS botanical_notes (
       id INTEGER PRIMARY KEY CHECK (id = 1),
       layout_notes TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS app_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
   `);
@@ -307,6 +321,20 @@ export function createSqlitePersistence(dbPath = process.env.DATABASE_PATH ?? de
     WHERE id = 1
   `);
 
+  const upsertAppSetting = db.prepare(`
+    INSERT INTO app_settings (key, value, updated_at)
+    VALUES (@key, @value, @updated_at)
+    ON CONFLICT(key) DO UPDATE SET
+      value = excluded.value,
+      updated_at = excluded.updated_at
+  `);
+
+  const getAppSettingByKey = db.prepare(`
+    SELECT key, value, updated_at
+    FROM app_settings
+    WHERE key = ?
+  `);
+
   return {
     saveConversation(input) {
       const result = insertConversation.run({
@@ -405,6 +433,21 @@ export function createSqlitePersistence(dbPath = process.env.DATABASE_PATH ?? de
       });
 
       return mapNullableBotanicalNotes(getBotanicalNotes.get()) as BotanicalNotesRecord;
+    },
+
+    getAppSetting(key) {
+      const row = getAppSettingByKey.get(key);
+      return row ? (row as AppSettingRecord) : null;
+    },
+
+    setAppSetting(key, value) {
+      upsertAppSetting.run({
+        key,
+        value,
+        updated_at: new Date().toISOString()
+      });
+
+      return getAppSettingByKey.get(key) as AppSettingRecord;
     },
 
     close() {

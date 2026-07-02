@@ -32,6 +32,12 @@ const BotanicalNotesBodySchema = z.object({
   layout_notes: z.string()
 });
 
+const ModelSelectionBodySchema = z.object({
+  model: z.string().trim().min(1, "model non puo essere vuoto")
+});
+
+const selectedLlmModelSettingKey = "selected_llm_model";
+
 type BuildAppOptions = {
   llmProvider?: LlmProvider;
   persistence?: Persistence;
@@ -44,6 +50,11 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
 
   const llmProvider = options.llmProvider ?? createLlmProvider();
   const persistence = options.persistence ?? createSqlitePersistence();
+  const savedModel = persistence.getAppSetting(selectedLlmModelSettingKey);
+
+  if (savedModel && llmProvider.setModel) {
+    llmProvider.setModel(savedModel.value);
+  }
 
   app.addHook("onClose", async () => {
     persistence.close();
@@ -61,6 +72,48 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
       model: llmProvider.model ?? null,
       llm: llmDiagnostics,
       timestamp: new Date().toISOString()
+    };
+  });
+
+  app.put("/api/llm/model", async (request, reply) => {
+    const parsed = ModelSelectionBodySchema.safeParse(request.body);
+
+    if (!parsed.success) {
+      return reply.status(400).send({
+        error: "Modello LLM non valido.",
+        detail: parsed.error.issues[0]?.message ?? "Payload non valido."
+      });
+    }
+
+    if (!llmProvider.setModel) {
+      return reply.status(400).send({
+        error: "Cambio modello non supportato.",
+        detail: `Il provider "${llmProvider.name}" non supporta il cambio modello runtime.`
+      });
+    }
+
+    const diagnostics = llmProvider.diagnostics ? await llmProvider.diagnostics() : null;
+    const installedModels = diagnostics?.installedModels ?? [];
+
+    if (!installedModels.includes(parsed.data.model)) {
+      return reply.status(400).send({
+        error: "Modello non installato.",
+        detail: `Il modello "${parsed.data.model}" non risulta installato in Ollama.`,
+        installedModels
+      });
+    }
+
+    await llmProvider.setModel(parsed.data.model);
+    persistence.setAppSetting(selectedLlmModelSettingKey, parsed.data.model);
+
+    const nextDiagnostics = llmProvider.diagnostics
+      ? await llmProvider.diagnostics()
+      : null;
+
+    return {
+      provider: llmProvider.name,
+      model: llmProvider.model ?? parsed.data.model,
+      llm: nextDiagnostics
     };
   });
 

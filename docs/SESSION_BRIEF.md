@@ -6,26 +6,28 @@ Data: 2026-07-02
 
 Obiettivo della sessione:
 
-- portare Ollama dentro la UI in modo leggibile;
-- mostrare se il modello configurato e davvero installato;
-- non cambiare ancora modello dalla UI, per evitare ambiguita operativa;
-- verificare il pannello con test e health check locale.
+- permettere il cambio del modello Ollama dalla UI;
+- limitare la scelta ai modelli realmente installati;
+- salvare la scelta senza modificare automaticamente `.env`;
+- verificare endpoint, persistenza e UI.
 
 ## Decisioni Prese
 
-- `/api/health` ora restituisce anche `llm`, con diagnostica provider.
-- Il provider `ollama` interroga `GET /api/tags` di Ollama.
-- La Console Interrogatoria mostra stato diagnostico, base URL e modelli installati.
-- La selezione dinamica del modello resta fuori da questa sessione: prima mostriamo lo stato, poi eventualmente abilitiamo il cambio.
+- Il cambio modello avviene via `PUT /api/llm/model`.
+- Il backend accetta solo modelli presenti nella diagnostica Ollama.
+- Il modello selezionato viene salvato in SQLite nella tabella `app_settings`.
+- Al riavvio, se esiste una scelta salvata, il provider Ollama la carica.
+- La UI disabilita il selettore se c'e un solo modello installato.
+- `.env` resta configurazione iniziale/fallback, non viene riscritto dalla UI.
 
 ## File Aggiornati
 
+- `server/db.ts`
 - `server/llm/types.ts`
-- `server/llm/mock-provider.ts`
 - `server/llm/ollama-provider.ts`
-- `server/llm/ollama-provider.test.ts`
 - `server/app.ts`
 - `server/app.test.ts`
+- `src/App.tsx`
 - `src/lib/api-types.ts`
 - `src/hooks/useProviderStatus.ts`
 - `src/components/InterrogationConsole.tsx`
@@ -36,49 +38,49 @@ Obiettivo della sessione:
 
 ## Stato Attuale
 
-- La UI mostra provider e modello come prima.
-- Se il provider e `ollama`, la UI mostra anche:
-  - stato `ready`, `missing_model` o `unreachable`;
-  - endpoint Ollama;
-  - dettaglio diagnostico;
-  - lista dei modelli installati;
-  - evidenza sul modello configurato.
-- `gemma4:latest` risulta `ready` nella prova locale.
-- Health check reale verificato su `http://127.0.0.1:5175/api/health`.
-- Dev server avviato su `http://127.0.0.1:5175/`.
+- La Console Interrogatoria mostra un select per i modelli Ollama installati.
+- Il select e disabilitato quando Ollama espone un solo modello.
+- Cambiare modello aggiorna il provider runtime.
+- La scelta viene salvata in SQLite e recuperata al prossimo avvio backend.
+- Nel Mac attuale risulta installato solo `gemma4:latest`, quindi il selettore appare ma resta disabilitato.
+- Prova reale eseguita su `PUT /api/llm/model` con `gemma4:latest`: riuscita.
 
 ## Controllo Qualita Sessione
 
 Errori o lacune trovate:
 
-- Prima la UI diceva solo quale modello era configurato, non se fosse davvero installato.
-- Mancava un modo visibile per distinguere Ollama non raggiungibile da modello mancante.
+- Prima la UI mostrava i modelli installati ma non permetteva di sceglierli.
+- Senza persistenza, un eventuale cambio modello sarebbe stato fragile e facile da dimenticare.
 
 Correzioni applicate:
 
-- Aggiunta diagnostica LLM nel contratto provider.
-- Aggiunta diagnostica Ollama via `/api/tags`.
-- Aggiunto pannello diagnostico nella Console Interrogatoria.
-- Aggiunti test per health diagnostics e provider Ollama con modello presente/mancante.
+- Aggiunto `setModel` al contratto provider.
+- Reso il provider Ollama mutabile a runtime.
+- Aggiunta persistenza `app_settings` in SQLite.
+- Aggiunto endpoint `PUT /api/llm/model`.
+- Aggiunto select modello nella Console Interrogatoria.
+- Aggiunti test per cambio modello valido e modello mancante.
 
 Verifiche eseguite:
 
-- `pnpm test`: 25 test passanti.
+- `pnpm test`: 27 test passanti.
 - `pnpm typecheck`: completato senza errori.
 - `pnpm build`: completato senza errori.
-- `curl http://127.0.0.1:5175/api/health`: `provider=ollama`, `model=gemma4:latest`, `llm.status=ready`.
+- `git diff --check`: completato senza errori.
+- `curl -X PUT http://127.0.0.1:5175/api/llm/model`: riuscito con `gemma4:latest`.
 
 ## Prossima Sessione Consigliata
 
 Obiettivo:
 
-- decidere se permettere la selezione modello dalla UI o passare al packaging locale.
+- preparare un avvio locale semplice fuori da Codex.
 
 Passi consigliati:
 
-1. Se vogliamo selezione modello, definire dove salvare la scelta: `.env`, SQLite o solo sessione.
-2. Se vogliamo packaging, preparare comandi semplici per avvio locale senza Codex.
-3. Se vogliamo test browser, installare Playwright solo a quel punto.
+1. Creare una guida rapida `docs/RUN_LOCAL.md`.
+2. Spiegare come avviare Ollama, backend e frontend.
+3. Documentare cosa fare se la porta 5173/5175 cambia.
+4. Valutare se aggiungere uno script `check:local`.
 
 ## Promemoria Operativo
 

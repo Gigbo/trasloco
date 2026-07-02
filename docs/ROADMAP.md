@@ -327,7 +327,7 @@ Criteri di completamento:
 14. Verifica accessibilita base. DONE
 15. Controllo installazioni e tooling locale. DONE
 16. Diagnostica Ollama in UI. DONE
-17. Eventuale selezione modello Ollama da UI.
+17. Selezione modello Ollama da UI. DONE
 18. Eventuale test browser con Playwright.
 19. Eventuale API cloud.
 20. Test e packaging.

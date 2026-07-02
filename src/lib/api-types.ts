@@ -57,6 +57,12 @@ export type ProviderStatusPayload = {
   detail?: string;
 };
 
+export type ModelSelectionPayload = {
+  provider: string;
+  model: string;
+  llm?: ProviderStatusPayload["llm"];
+};
+
 export type AppStatePayload = {
   latestSnapshot?: SnapshotPayload | null;
   recentSnapshots?: SnapshotPayload[];

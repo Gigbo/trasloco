@@ -21,5 +21,6 @@ export type LlmProvider = {
   name: LlmProviderName;
   model?: string;
   diagnostics?(): Promise<LlmDiagnostics>;
+  setModel?(model: string): Promise<void> | void;
   chat(request: ChatRequest): Promise<ChatResponse>;
 };

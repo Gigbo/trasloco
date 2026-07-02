@@ -9,7 +9,12 @@ import { useProviderStatus } from "./hooks/useProviderStatus";
 import { parseRelocationResponse } from "./lib/parse-ai-json";
 
 export default function App() {
-  const { providerStatus, refreshProviderStatus } = useProviderStatus();
+  const {
+    providerStatus,
+    isChangingModel,
+    refreshProviderStatus,
+    changeProviderModel
+  } = useProviderStatus();
   const relocationState = usePersistedRelocationState({
     onProviderStatusRefresh: refreshProviderStatus
   });
@@ -26,6 +31,7 @@ export default function App() {
           rawResponse={relocationState.rawResponse}
           apiStatus={relocationState.apiStatus}
           providerStatus={providerStatus}
+          isChangingModel={isChangingModel}
           isLoading={relocationState.isLoading}
           persistedItems={relocationState.persistedItems}
           conversations={relocationState.conversations}
@@ -35,6 +41,7 @@ export default function App() {
           onMessageChange={relocationState.setMessage}
           onRawResponseChange={relocationState.updateRawResponse}
           onSubmit={relocationState.interrogateBackend}
+          onModelChange={changeProviderModel}
           onSelectConversation={relocationState.selectConversation}
           onSelectSnapshot={relocationState.selectSnapshot}
         />
